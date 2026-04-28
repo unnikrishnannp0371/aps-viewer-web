@@ -1,0 +1,20 @@
+<div class="dashboard-page">
+    <div class="dashboard-card">
+        <h1 class="dashboard-title">
+            APS Viewer
+        </h1>
+        @if (user) {
+            <p class="welcome-message">Welcome, {{ user.name }}!</p>
+            <p class="email">{{ user.email }}</p>
+        } @else {
+            <p class="loading">Loading...</p>
+        }
+        <button class="logout-btn" (click)="onLogout()" [disabled]="isLoggingOut">
+            @if (isLoggingOut) {
+                <span>Logging out...</span>
+            } @else {
+            <span>Log Out</span>
+            }
+        </button>
+    </div>
+</div>
