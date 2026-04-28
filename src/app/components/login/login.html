@@ -1,0 +1,26 @@
+<div class="login-page">
+  <div class="login-card">
+
+    <h1 class="app-title">APS Viewer</h1>
+    <p class="app-subtitle">Autodesk Platform Services</p>
+
+    @if (showUnauthorizedBanner) {
+      <div class="banner banner-warning">
+        You must be logged in to access <strong>{{ unauthorizedPageName }}</strong>
+      </div>
+    }
+
+    <button
+      class="login-btn"
+      [disabled]="isLoading"
+      (click)="onLogin()"
+    >
+      @if (isLoading) {
+        <span>Redirecting...</span>
+      } @else {
+        <span>Login with Autodesk</span>
+      }
+    </button>
+
+  </div>
+</div>
