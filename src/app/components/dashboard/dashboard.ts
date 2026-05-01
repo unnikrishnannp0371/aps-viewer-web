@@ -22,8 +22,6 @@ export class Dashboard implements OnInit {
   ngOnInit(): void {
     this.authService.checkStatus().subscribe({
       next: (status) => {
-        console.log('Auth status:', status);
-        console.log('User:', status.user);
         if (status.authenticated && status.user) {
           this.user = status.user;
           this.cdr.detectChanges();
@@ -48,5 +46,9 @@ export class Dashboard implements OnInit {
         this.isLoggingOut = false;
       }
     });
+  }
+
+  onBrowseFiles(): void {
+    this.router.navigate(['/browser'])
   }
 }

@@ -1,0 +1,23 @@
+<div class="list-container">
+  @if (hubs.length === 0) {
+    <div class="empty-state">
+      No Hubs Found
+    </div>
+  }
+  @for (hub of hubs; track hub.id){
+    <div class="list-item" (click)="onHubClick(hub)">
+      <div class="item-icon hub-icon">
+        {{ getHubIcon(hub.type) }}
+      </div>
+      <div class="item-info">
+        <span class="item-name">
+          {{ hub.name }}
+        </span>
+        <span class="item-type">
+          {{ hub.type }}
+        </span>
+      </div>
+      <div class="item-arrow">></div>
+    </div>
+  }
+</div>

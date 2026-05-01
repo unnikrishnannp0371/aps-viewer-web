@@ -1,0 +1,18 @@
+<div class="breadcrumb-bar">
+  <span class="bc-item bc-click" (click)="onCrumbClick({ label: 'Hubs', level: 'root', id: '' })">
+    Hubs
+  </span>
+
+  @for (crumb of breadcrumbs; track crumb.id) {
+    <span class="bc-separator">></span>
+    @if (crumb === breadcrumbs[breadcrumbs.length - 1]){
+      <span class="bc-item bc-current">
+        {{ crumb.label }}
+      </span>
+    } @else {
+      <span class="bc-item bc-link" (click)="onCrumbClick(crumb)">
+        {{ crumb.label }}
+      </span>
+    }
+  }
+</div>

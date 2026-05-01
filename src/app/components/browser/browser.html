@@ -1,0 +1,55 @@
+<div class="browser-page">
+    <div class="browser-card">
+        <div class="browser-header">
+            <h2 class="browser-title">File Browser</h2>
+        </div>
+
+        @if (breadcrumbs.length > 0) {
+            <app-breadcrumb
+                [breadcrumbs]="breadcrumbs"
+                (breadcrumbClick)="onBreadcrumbClick($event)" />
+        }
+
+        @if (isLoading) {
+          <div class="browser-loading">
+            <div class="spinner"></div>
+              <span>Loading...</span>
+          </div>
+        }
+
+        @if (error) {
+          <div class="browser-error">{{ error }}</div>
+        }
+
+        @if (!isLoading && !error) {
+          @if (level === 'hubs') {
+            <app-hub-list [hubs]="hubs" (hubSelected)="onHubSelected($event)" />
+          }
+          @if (level === 'projects') {
+            <app-project-list [projects]="projects" (projectSelected)="onProjectSelected($event)" />
+          }
+          @if (level === 'folders' || level === 'contents') {
+            <app-folder-list
+              [items]="level === 'folders' ? folders : contents"
+              [level]="level"
+              [selectedFile]="selectedFile"
+              [projectId]="selectedProject?.project_id || ''"
+              (folderSelected)="onFolderSelected($event)"
+              (fileSelected)="onFileSelected($event)"
+            />
+          }
+        }
+
+        @if (selectedFile) {
+          <div class="action-bar">
+            <div class="selected-file">
+              <span class="selected-label">Selected:</span>
+                <span class="selected-name">{{ selectedFile.name }}</span>
+            </div>
+            <button class="translate-btn" (click)="onTranslateAndShare()">
+              Translate and Share
+            </button>
+          </div>
+        }
+    </div>
+</div>

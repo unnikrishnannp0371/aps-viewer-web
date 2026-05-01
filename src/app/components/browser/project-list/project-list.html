@@ -1,0 +1,23 @@
+<div class="list-container">
+  @if (projects.length === 0) {
+    <div class="empty-state">No projects found</div>
+  }
+
+  @for (project of projects; track project.project_id){
+    <div class="list-item" (click)="onProjectClick(project)">
+      <div class="item-icon project-icon">
+        {{ getProjectIcon(project.type) }}
+      </div>
+
+      <div class="item-info">
+        <span class="item-name">
+          {{ project.name }}
+        </span>
+        <span class="item-type">
+          {{ project.type }}
+        </span>
+      </div>
+      <div class="item-arrow">></div>
+    </div>
+  }
+</div>
