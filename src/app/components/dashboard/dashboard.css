@@ -60,3 +60,21 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+
+.browse-btn {
+  width: 100%;
+  padding: 14px;
+  background: #0696d7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 16px;
+}
+
+.browse-btn:hover {
+  background: #0578b5;
+}
