@@ -5,13 +5,15 @@ import { HubList } from './hub-list/hub-list';
 import { ProjectList } from './project-list/project-list';
 import { FolderList } from './folder-list/folder-list';
 import { Breadcrumb } from './breadcrumb/breadcrumb';
+import { ShareDialog } from '../share-dialog/share-dialog';
+
 
 type BrowserLevel = 'hubs' | 'projects' | 'folders' | 'contents'
 
 @Component({
   standalone: true,
   selector: 'app-browser',
-  imports: [CommonModule, HubList, ProjectList, FolderList, Breadcrumb],
+  imports: [CommonModule, HubList, ProjectList, FolderList, Breadcrumb, ShareDialog],
   templateUrl: './browser.html',
   styleUrl: './browser.css',
 })
@@ -32,6 +34,8 @@ export class Browser implements OnInit {
   breadcrumbs: BreadcrumbItem[] = [];
   isLoading = false;
   error: string | null = null;
+
+  showShareDialog = false;
 
   constructor(
     private browserServce: BrowserService,
@@ -163,7 +167,11 @@ export class Browser implements OnInit {
     }
   }
 
-  onTranslateAndShare (): void {
-    console.log("Coming Soon");
+  onTranslateAndShare(): void {
+    this.showShareDialog = true;
+  }
+
+  onDialogClosed(): void {
+    this.showShareDialog = false;
   }
 }

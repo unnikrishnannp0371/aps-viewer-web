@@ -20,6 +20,10 @@ export const routes: Routes = [
         canActivate: [authGuard]
     },
     {
+      path: 'view/:token',
+      loadComponent: () => import('./components/viewer/viewer').then(m => m.Viewer)
+    },
+    {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'

@@ -52,4 +52,10 @@
           </div>
         }
     </div>
+    @if (showShareDialog && selectedFile) {
+      <app-share-dialog
+        [file]="selectedFile"
+        (closed)="onDialogClosed()"
+      />
+    }
 </div>

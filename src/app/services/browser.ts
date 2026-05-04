@@ -26,8 +26,10 @@ export interface Folder {
 export interface FolderItem {
   content_id: string;
   folder_id: string;
+  project_id: string;
   name: string;
   type: string;
+  tip_urn: string | null;
 }
 
 export interface BreadcrumbItem {
