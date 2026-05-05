@@ -1,0 +1,82 @@
+<div class="viewer-page">
+  @if (isLoading) {
+    <div class="viewer-loading">
+      <div class="spinner"></div>
+      <span>Loading viewer...</span>
+    </div>
+  }
+
+  @if (error) {
+    <div class="viewer-error">
+      <div class="error-icon">⚠</div>
+      <h2 class="error-title">Unable to load model</h2>
+      <p class="error-message">{{ error }}</p>
+    </div>
+  }
+
+  @if (!isLoading && !error && viewerData) {
+    <div class="viewer-header">
+      <div class="viewer-header-left">
+        <span class="viewer-filename">{{ viewerData.file_name }}</span>
+      </div>
+      <div class="viewer-header-right">
+        <span class="viewer-expiry">
+          Expires {{ viewerData.expires_at | date:'mediumDate' }}
+        </span>
+      </div>
+    </div>
+  }
+
+  <div class="viewer-body">
+    @if (viewables3D.length > 0 || viewables2D.length > 0) {
+      <div class="views-panel">
+        <div class="panel-tabs">
+          <button
+            class="panel-tab"
+            [class.active]="activeTab === '3d'"
+            (click)="activeTab = '3d'"
+          >
+            3D ({{ viewables3D.length }})
+          </button>
+          <button
+            class="panel-tab"
+            [class.active]="activeTab === '2d'"
+            (click)="activeTab = '2d'"
+          >
+            Sheets ({{ viewables2D.length }})
+          </button>
+        </div>
+
+        <div class="panel-list">
+          @if (activeTab === '3d') {
+            @for (view of viewables3D; track $index) {
+              <div
+                class="panel-item"
+                [class.active]="activeViewIndex === $index && activeTab === '3d'"
+                (click)="loadView(view, $index, '3d')"
+              >
+                <span class="panel-item-icon">⬡</span>
+                <span class="panel-item-name">{{ view.data.name || '3D View ' + ($index + 1) }}</span>
+              </div>
+            }
+          }
+
+          @if (activeTab === '2d') {
+            @for (sheet of viewables2D; track $index) {
+              <div
+                class="panel-item"
+                [class.active]="activeViewIndex === $index && activeTab === '2d'"
+                (click)="loadView(sheet, $index, '2d')"
+              >
+                <span class="panel-item-icon">▦</span>
+                <span class="panel-item-name">{{ sheet.data.name || 'Sheet ' + ($index + 1) }}</span>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    }
+
+    <div #viewerContainer class="viewer-container"></div>
+  </div>
+</div>

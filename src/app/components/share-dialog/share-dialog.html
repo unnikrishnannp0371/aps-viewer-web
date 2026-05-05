@@ -1,0 +1,87 @@
+<div class="dialog-overlay" (click)="onClose()">
+  <div class="dialog-card" (click)="$event.stopPropagation()">
+
+    <div class="dialog-header">
+      <h3 class="dialog-title">Translate & Share</h3>
+      <button class="close-btn" (click)="onClose()">✕</button>
+    </div>
+
+    <div class="file-info">
+      <div class="file-icon">RVT</div>
+      <span class="file-name">{{ file.name }}</span>
+    </div>
+
+    @if (state === 'checking') {
+      <div class="dialog-body">
+        <div class="status-row">
+          <div class="spinner"></div>
+          <span>
+            @if (progress) {
+              Translating... {{ progress }}
+            } @else {
+              Checking translation status...
+            }
+          </span>
+        </div>
+      </div>
+    }
+
+    @if (state === 'ready') {
+      <div class="dialog-body">
+        <p class="section-label">Link expires in</p>
+        <div class="expiry-options">
+          @for (option of expiryOptions; track option.value) {
+            <button
+              class="expiry-btn"
+              [class.active]="expiresInDays === option.value"
+              (click)="onExpirySelect(option.value)"
+            >
+              {{ option.label }}
+            </button>
+          }
+        </div>
+        <button class="generate-btn" (click)="onGenerate()">
+          Generate Shareable Link
+        </button>
+      </div>
+    }
+
+    @if (state === 'generating') {
+      <div class="dialog-body">
+        <div class="status-row">
+          <div class="spinner"></div>
+          <span>Generating link...</span>
+        </div>
+      </div>
+    }
+
+    @if (state === 'done' && shareResult) {
+      <div class="dialog-body">
+        <p class="section-label">Shareable Link</p>
+        <div class="url-row">
+          <input
+            class="url-input"
+            [value]="shareResult.url"
+            readonly
+          />
+          <button class="copy-btn" (click)="onCopy()">
+            {{ copied ? '✓ Copied' : 'Copy' }}
+          </button>
+        </div>
+        <p class="expiry-note">
+          Expires on {{ formatDate(shareResult.expires_at) }}
+        </p>
+      </div>
+    }
+
+    @if (state === 'error') {
+      <div class="dialog-body">
+        <div class="error-msg">{{ errorMessage }}</div>
+        <button class="generate-btn" (click)="checkTranslationStatus()">
+          Try Again
+        </button>
+      </div>
+    }
+
+  </div>
+</div>
