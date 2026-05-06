@@ -209,3 +209,63 @@
   font-size: 0.875rem;
   margin-bottom: 16px;
 }
+.version-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.version-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.version-item:hover {
+  border-color: #0696d7;
+  background: #f8f9ff;
+}
+
+.version-item.active {
+  border-color: #0696d7;
+  background: #e3f2fd;
+}
+
+.version-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.version-number {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.version-meta {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.version-check {
+  color: #0696d7;
+  font-weight: 700;
+}
+
+.selected-version-note {
+  font-size: 0.8rem;
+  color: #0696d7;
+  background: #e3f2fd;
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin: 0 0 16px;
+}

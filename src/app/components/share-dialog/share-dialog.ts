@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FolderItem } from '../../services/browser';
-import { ShareResponse, TranslationService } from '../../services/translation';
+import { ShareResponse, TranslationService, Version } from '../../services/translation';
 
-type DialogStatus = 'checking' | 'ready' | 'generating' | 'done' | 'error'
+type DialogStatus = 'checking' | 'versions' | 'ready' | 'generating' | 'done' | 'error'
 
 @Component({
   standalone: true,
@@ -21,6 +21,13 @@ export class ShareDialog implements OnInit{
   shareResult: ShareResponse | null = null;
   errorMessage = '';
   copied = false;
+  progress = '';
+  private pollCount = 0;
+  private maxPolls = 30;
+
+  versions: Version[] = [];
+  selectedVersion: Version | null = null;
+  selectedUrn: string | null = null;
 
   expiryOptions: {label: string, value: number}[] = [
     { label: '7 days', value: 7 },
@@ -34,12 +41,47 @@ export class ShareDialog implements OnInit{
   ) {}
 
   ngOnInit(): void {
+    this.loadVersions();
+  }
+
+  loadVersions(): void {
+    this.state = 'checking';
+
+    this.translationService.getVersions(
+      this.file.project_id,
+      this.file.content_id
+    ).subscribe({
+      next: (fetchedVersions) => {
+        this.versions = fetchedVersions
+
+        if (fetchedVersions.length === 1){
+          this.selectedVersion = fetchedVersions[0];
+          this.selectedUrn = fetchedVersions[0].version_urn
+          this.checkTranslationStatus();
+        } else {
+          this.state = 'versions';
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {
+        if (this.file.tip_urn) {
+          this.selectedUrn = this.file.tip_urn;
+          this.checkTranslationStatus();
+        } else {
+          this.errorMessage = 'Could not load file versions'
+          this.state = 'error'
+          this.cdr.detectChanges();
+        }
+      },
+    })
+  }
+
+  onVersionSelect(version: Version): void {
+    this.selectedVersion = version;
+    this.selectedUrn = version.version_urn
     this.checkTranslationStatus();
   }
 
-  progress = '';
-  private pollCount = 0;
-  private maxPolls = 30;
   checkTranslationStatus(): void {
     this.pollCount++;
 
@@ -52,14 +94,14 @@ export class ShareDialog implements OnInit{
 
     this.state = 'checking';
 
-    if (!this.file.tip_urn) {
+    if (!this.selectedUrn) {
       this.state = 'error';
       this.errorMessage = 'This file has no translation available.';
       this.cdr.detectChanges();
       return;
     }
 
-    this.translationService.checkStatus(this.file.tip_urn!).subscribe({
+    this.translationService.checkStatus(this.selectedUrn!).subscribe({
       next: (status) => {
         if (status.status === 'success') {
           this.state = 'ready';
@@ -89,7 +131,7 @@ export class ShareDialog implements OnInit{
   onGenerate(): void {
     this.state = 'generating';
     this.translationService.share(
-      this.file.tip_urn!,
+      this.selectedUrn!,
       this.file.name,
       this.expiresInDays
     ).subscribe({
@@ -128,5 +170,13 @@ export class ShareDialog implements OnInit{
       month: 'long',
       day: 'numeric'
     });
+  }
+
+  formatVersionDate(dateStr: string): string {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
   }
 }
