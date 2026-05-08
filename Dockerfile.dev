@@ -1,0 +1,13 @@
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Copy app (will be overridden by volume mount)
+COPY . .
+
+EXPOSE 4200
+CMD ["npx", "ng", "serve", "--host", "0.0.0.0", "--poll", "500"]
