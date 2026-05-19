@@ -14,7 +14,6 @@ export interface ShareResponse {
   token: string;
   expires_at: string;
   file_name: string;
-  
 }
 
 export interface ViewerData {
@@ -24,6 +23,15 @@ export interface ViewerData {
   expires_at: string;
 }
 
+export interface Version {
+  version_id: string;
+  version_urn: string;
+  version_number: number;
+  name: string;
+  file_type: string;
+  created_at: string;
+  created_by: string;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -52,5 +60,7 @@ export class TranslationService {
     return this.http.get<ViewerData>(`/viewer/${token}`);
   }
 
-  // get()
+  getVersions(projectId: string, itemId: string): Observable<Version[]> {
+    return this.http.get<Version[]>(`${this.apiBaseUrl}/projects/${projectId}/items/${itemId}/versions`);
+  }
 }
