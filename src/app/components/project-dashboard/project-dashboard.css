@@ -1,0 +1,230 @@
+/* src/app/components/project-dashboard/project-dashboard.css
+   ─────────────────────────────────────────────────────────────
+   Design language: IBM Plex Sans, dark steel header, #0696d7 accent.
+   Tab bar sits between the persistent health panel and the panel content.
+*/
+
+/* ── Page ─────────────────────────────────────────────────────────────────── */
+
+.dashboard-page {
+  min-height: 100vh;
+  background: #f0f2f5;
+  font-family: 'IBM Plex Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+
+.dashboard-header {
+  height: 56px;
+  background: #1a1f2e;
+  border-bottom: 2px solid #0696d7;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #0696d7;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.15s;
+}
+
+.back-btn:hover { opacity: 0.7; }
+
+.header-divider {
+  width: 1px;
+  height: 24px;
+  background: #374151;
+}
+
+.header-project {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.header-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.project-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.project-name-skeleton {
+  display: inline-block;
+  width: 200px;
+  height: 14px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #2d3748 25%, #3d4a5c 50%, #2d3748 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+  margin-top: 2px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.brand-icon {
+  color: #0696d7;
+  font-size: 1.2rem;
+}
+
+/* ── Main layout ──────────────────────────────────────────────────────────── */
+
+.dashboard-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 32px;
+  gap: 0;                /* gaps controlled per-section below */
+}
+
+/* ── Health section ───────────────────────────────────────────────────────── */
+
+.health-section {
+  margin-bottom: 24px;
+}
+
+/* ── Tab Bar ──────────────────────────────────────────────────────────────── */
+
+.tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 24px;
+}
+
+.tab-btn {
+  position: relative;
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;         /* overlap the tab-bar border */
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.tab-btn:hover:not(:disabled) {
+  color: #1a1f2e;
+}
+
+.tab-btn--active {
+  color: #0696d7;
+  border-bottom-color: #0696d7;
+  font-weight: 600;
+}
+
+/* Stub tabs — visible but clearly unavailable */
+.tab-btn--stub {
+  color: #d1d5db;
+  cursor: default;
+}
+
+.tab-soon {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+/* ── Tab content ──────────────────────────────────────────────────────────── */
+
+.tab-content {
+  flex: 1;
+}
+
+/* Placeholder shown for stub tabs and the RFI tab before the panel is wired */
+.tab-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 80px 0;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+.placeholder-icon {
+  font-size: 2rem;
+  opacity: 0.4;
+}
+
+/* ── Viewer section ───────────────────────────────────────────────────────── */
+
+.viewer-section {
+  margin-top: 24px;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .dashboard-header {
+    padding: 0 16px;
+  }
+
+  .dashboard-main {
+    padding: 16px;
+  }
+
+  .tab-btn {
+    padding: 10px 14px;
+    font-size: 0.8rem;
+  }
+
+  .header-right {
+    display: none;
+  }
+}

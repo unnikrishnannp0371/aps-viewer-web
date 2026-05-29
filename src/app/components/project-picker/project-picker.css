@@ -1,0 +1,308 @@
+/* src/app/components/project-picker/project-picker.css
+   ─────────────────────────────────────────────────────
+   Aesthetic: clean, technical, construction-grade.
+   Dark topbar + white card + precise grid lines.
+   Font: IBM Plex Sans — technical, modern, not generic.
+*/
+
+/* ── Page ─────────────────────────────────────────────────────────────────── */
+
+.picker-page {
+  min-height: 100vh;
+  background: #f0f2f5;
+  font-family: 'IBM Plex Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Top Bar ──────────────────────────────────────────────────────────────── */
+
+.picker-topbar {
+  height: 56px;
+  background: #1a1f2e;
+  border-bottom: 2px solid #0696d7;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+
+.brand-icon {
+  color: #0696d7;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-name {
+  font-size: 0.875rem;
+  color: #a0aec0;
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid #374151;
+  color: #a0aec0;
+  padding: 5px 14px;
+  border-radius: 4px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.logout-btn:hover {
+  border-color: #0696d7;
+  color: #fff;
+}
+
+/* ── Main ─────────────────────────────────────────────────────────────────── */
+
+.picker-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 48px 24px;
+}
+
+/* ── Card ─────────────────────────────────────────────────────────────────── */
+
+.picker-card {
+  background: #fff;
+  border-radius: 8px;
+  border-left: 4px solid #0696d7;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 640px;
+  /* Don't stretch to full page height — just wrap content */
+  align-self: flex-start;
+  overflow: hidden;
+}
+
+/* ── Card Header ──────────────────────────────────────────────────────────── */
+
+.picker-card-header {
+  padding: 24px 28px 18px;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+/* ── Breadcrumb ───────────────────────────────────────────────────────────── */
+
+.picker-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.breadcrumb-active {
+  color: #1a1f2e;
+}
+
+.breadcrumb-back {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #0696d7;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.breadcrumb-back:hover {
+  opacity: 0.7;
+}
+
+.breadcrumb-sep {
+  color: #cbd5e0;
+  font-weight: 300;
+}
+
+.picker-hint {
+  font-size: 0.825rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* ── Loading ──────────────────────────────────────────────────────────────── */
+
+.picker-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 28px;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #0696d7;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Error ────────────────────────────────────────────────────────────────── */
+
+.picker-error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 28px;
+  padding: 12px 16px;
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 6px;
+  color: #c53030;
+  font-size: 0.875rem;
+}
+
+.retry-btn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid #feb2b2;
+  color: #c53030;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.retry-btn:hover {
+  background: #fff0f0;
+}
+
+/* ── List ─────────────────────────────────────────────────────────────────── */
+
+.picker-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.picker-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 28px;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.12s;
+}
+
+.picker-item:last-child {
+  border-bottom: none;
+}
+
+.picker-item:hover {
+  background: #f5faff;
+}
+
+.picker-item:hover .item-chevron {
+  color: #0696d7;
+  transform: translateX(3px);
+}
+
+/* ── Badge ────────────────────────────────────────────────────────────────── */
+
+.item-badge {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8f4fc;
+  color: #0578b5;
+  border-radius: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* Projects get a green badge to visually separate them from hubs */
+.project-badge {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+/* ── Item Info ────────────────────────────────────────────────────────────── */
+
+.item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0; /* allows text-overflow to work inside flex */
+}
+
+.item-name {
+  font-size: 0.925rem;
+  font-weight: 500;
+  color: #1a1f2e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-type {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Chevron ──────────────────────────────────────────────────────────────── */
+
+.item-chevron {
+  color: #d1d5db;
+  font-size: 1.2rem;
+  font-weight: 300;
+  transition: color 0.12s, transform 0.12s;
+  flex-shrink: 0;
+}
+
+/* ── Empty State ──────────────────────────────────────────────────────────── */
+
+.empty-state {
+  padding: 40px 28px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}

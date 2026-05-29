@@ -1,0 +1,318 @@
+/* src/app/components/health-panel/health-panel.css
+   ──────────────────────────────────────────────────
+   Green left border — green = health score.
+   Score ring uses SVG stroke-dashoffset to animate the arc.
+*/
+
+/* ── Panel Card ───────────────────────────────────────────────────────────── */
+
+.health-panel {
+  background: #ffffff;
+  border-radius: 8px;
+  border-left: 4px solid transparent; 
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  font-family: 'IBM Plex Sans', sans-serif;
+  overflow: hidden;
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+
+.panel-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.panel-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.panel-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1f2e;
+  margin: 0;
+}
+
+.calculated-at {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: #9ca3af;
+  letter-spacing: 0.03em;
+}
+
+.panel-subtitle {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* ── Loading ──────────────────────────────────────────────────────────────── */
+
+.panel-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 24px;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #38a169;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Error ────────────────────────────────────────────────────────────────── */
+
+.panel-error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 24px;
+  padding: 12px 16px;
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 6px;
+  color: #c53030;
+  font-size: 0.875rem;
+}
+
+.retry-btn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid #feb2b2;
+  color: #c53030;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.retry-btn:hover {
+  background: #fff0f0;
+}
+
+/* ── Health Body ──────────────────────────────────────────────────────────── */
+
+.health-body {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 0;
+  min-height: 280px;
+}
+
+/* ── Score Section (left) ─────────────────────────────────────────────────── */
+
+.score-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 20px;
+  border-right: 1px solid #f3f4f6;
+  gap: 12px;
+}
+
+/* ── Score Ring ───────────────────────────────────────────────────────────── */
+
+.score-ring-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.score-ring {
+  width: 120px;
+  height: 120px;
+}
+
+/* Animate the arc drawing in on load */
+.ring-fill {
+  transition: stroke-dashoffset 0.8s ease, stroke 0.4s ease;
+}
+
+/* Score number centred inside the ring */
+.score-centre {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+.score-number {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1;
+  transition: color 0.4s ease;
+}
+
+.score-out-of {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+/* ── Grade Badge ──────────────────────────────────────────────────────────── */
+
+.grade-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 4px;
+  border: 1px solid;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.health-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+/* ── Detail Section (right) ───────────────────────────────────────────────── */
+
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  gap: 24px;
+}
+
+/* ── Section Title ────────────────────────────────────────────────────────── */
+
+.section-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+  margin: 0 0 12px 0;
+}
+
+/* ── Domain Bars ──────────────────────────────────────────────────────────── */
+
+.domain-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.domain-row {
+  display: grid;
+  grid-template-columns: 140px 1fr 36px;
+  align-items: center;
+  gap: 10px;
+}
+
+.domain-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.domain-label {
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.domain-weight {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  color: #9ca3af;
+}
+
+.domain-bar-track {
+  height: 8px;
+  background: #f3f4f6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.domain-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease, background 0.4s ease;
+  min-width: 2px;
+}
+
+.domain-score {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: right;
+  transition: color 0.4s ease;
+}
+
+/* ── Signals ──────────────────────────────────────────────────────────────── */
+
+.signals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.signal-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #fafafa;
+  border-radius: 6px;
+  border: 1px solid #f3f4f6;
+}
+
+.signal-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background 0.3s ease;
+}
+
+.signal-label {
+  flex: 1;
+  font-size: 0.825rem;
+  color: #4b5563;
+}
+
+.signal-value {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: color 0.3s ease;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .health-body {
+    grid-template-columns: 1fr;
+  }
+
+  .score-section {
+    border-right: none;
+    border-bottom: 1px solid #f3f4f6;
+    padding: 24px;
+  }
+}
