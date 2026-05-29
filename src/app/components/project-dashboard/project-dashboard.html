@@ -1,0 +1,107 @@
+
+
+<!-- src/app/components/project-dashboard/project-dashboard.html -->
+
+<div class="dashboard-page">
+
+  <!-- ── Header ───────────────────────────────────────────────────────────── -->
+  <header class="dashboard-header">
+
+    <div class="header-left">
+      <button class="back-btn" (click)="onBackToPicker()">
+        ‹ All Projects
+      </button>
+
+      <div class="header-divider"></div>
+
+      <div class="header-project">
+        <span class="header-label">PROJECT</span>
+        @if (isLoadingProject) {
+          <span class="project-name-skeleton"></span>
+        } @else {
+          <span class="project-name">{{ projectName }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="header-right">
+      <span class="brand-icon">◈</span>
+      <span class="brand-name">APS Dashboard</span>
+    </div>
+
+  </header>
+
+  <main class="dashboard-main">
+
+    <!-- ── Health Panel — always visible ─────────────────────────────────── -->
+    <section class="health-section">
+      <app-health-panel [hubId]="hubId" [projectId]="projectId" />
+    </section>
+
+    <!-- ── Tab Bar ───────────────────────────────────────────────────────── -->
+    <nav class="tab-bar">
+      @for (tab of tabs; track tab.key) {
+        <button
+          class="tab-btn"
+          [class.tab-btn--active]="isActive(tab.key)"
+          [class.tab-btn--stub]="!tab.ready"
+          [disabled]="!tab.ready"
+          (click)="selectTab(tab)"
+          [title]="!tab.ready ? tab.label + ' — coming soon' : ''">
+          {{ tab.label }}
+          @if (!tab.ready) {
+            <span class="tab-soon">soon</span>
+          }
+        </button>
+      }
+    </nav>
+
+    <!-- ── Tab Content ───────────────────────────────────────────────────── -->
+    <section class="tab-content">
+
+      <!-- Issues -->
+      @if (isActive('issues')) {
+        <app-issues-panel
+          [hubId]="hubId"
+          [projectId]="projectId"
+          (issueSelected)="onIssueSelected($event)">
+        </app-issues-panel>
+      }
+
+      <!-- RFIs — uncomment once RfiPanel is built in File 5 -->
+      @if (isActive('rfi')) {
+        <app-rfi-panel [hubId]="hubId" [projectId]="projectId" ></app-rfi-panel>
+        <!-- <div class="tab-placeholder">
+          <span class="placeholder-icon">📋</span>
+          <p>RFI panel loading…</p>
+        </div> -->
+      }
+
+      <!-- Submittals stub -->
+      @if (isActive('submittals')) {
+        <div class="tab-placeholder">
+          <span class="placeholder-icon">📁</span>
+          <p>Submittals panel coming soon</p>
+        </div>
+      }
+
+      <!-- Clashes stub -->
+      @if (isActive('clashes')) {
+        <div class="tab-placeholder">
+          <span class="placeholder-icon">⚡</span>
+          <p>Clashes panel coming soon</p>
+        </div>
+      }
+
+    </section>
+
+    <!-- ── Viewer — shown when an issue pushpin is clicked ───────────────── -->
+    @if (viewerTarget) {
+      <section class="viewer-section">
+        <app-dashboard-viewer [target]="viewerTarget" />
+      </section>
+    }
+
+  </main>
+
+</div>

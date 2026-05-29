@@ -1,0 +1,186 @@
+/* src/app/components/dashboard-viewer/dashboard-viewer.css
+   ──────────────────────────────────────────────────────────
+   The viewer panel slides up from the bottom of the dashboard
+   when an issue with a pushpin is clicked.
+   
+   Height is fixed at 500px when visible — tall enough to see
+   the model clearly, short enough that the issues table above
+   is still partially visible so the user knows they can keep
+   clicking other issues.
+*/
+
+/* ── Panel ────────────────────────────────────────────────────────────────── */
+
+.viewer-panel {
+  background: #ffffff;
+  border-radius: 8px;
+  border-left: 4px solid #0696d7;   /* blue = viewer, not red like issues */
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  font-family: 'IBM Plex Sans', sans-serif;
+  overflow: hidden;
+
+  /* Hidden state — zero height, invisible */
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: max-height 0.35s ease, opacity 0.25s ease;
+}
+
+/* Visible state — slides open */
+.viewer-panel.visible {
+  max-height: 580px;   /* 500px container + 50px header + breathing room */
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── Panel Header ─────────────────────────────────────────────────────────── */
+
+.viewer-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: #1a1f2e;
+  border-bottom: 2px solid #0696d7;
+  flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pushpin-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.header-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.header-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 500px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  background: transparent;
+  border: 1px solid #374151;
+  color: #a0aec0;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.action-btn:hover {
+  border-color: #0696d7;
+  color: #ffffff;
+}
+
+.close-btn {
+  background: transparent;
+  border: 1px solid #374151;
+  color: #a0aec0;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.close-btn:hover {
+  border-color: #e53e3e;
+  color: #e53e3e;
+  background: rgba(229, 62, 62, 0.08);
+}
+
+/* ── Loading ──────────────────────────────────────────────────────────────── */
+
+.viewer-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 28px;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #0696d7;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Error ────────────────────────────────────────────────────────────────── */
+
+.viewer-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 24px;
+  padding: 12px 16px;
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 6px;
+  color: #c53030;
+  font-size: 0.875rem;
+}
+
+.error-icon {
+  flex-shrink: 0;
+}
+
+/* ── Viewer Container ─────────────────────────────────────────────────────── */
+
+.viewer-container {
+  /* Fixed height — the APS Viewer needs explicit dimensions */
+  width: 100%;
+  height: 500px;
+}
+
+/* Hide the container while loading/error without removing from DOM.
+   Removing from DOM would destroy the WebGL context. */
+.viewer-container.hidden {
+  height: 0;
+  overflow: hidden;
+}
