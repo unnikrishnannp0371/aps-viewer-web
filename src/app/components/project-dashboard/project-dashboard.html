@@ -79,10 +79,7 @@
 
       <!-- Submittals stub -->
       @if (isActive('submittals')) {
-        <div class="tab-placeholder">
-          <span class="placeholder-icon">📁</span>
-          <p>Submittals panel coming soon</p>
-        </div>
+        <app-submittals-panel [hubId]="hubId" [projectId]="projectId" />
       }
 
       <!-- Clashes stub -->

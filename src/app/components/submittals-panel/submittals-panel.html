@@ -1,0 +1,280 @@
+<div class="submittals-panel">
+
+  <!-- ── Loading ─────────────────────────────────────────────────────────── -->
+  @if (loading) {
+    <div class="panel-loading">
+      <span class="spinner"></span>
+      Loading submittals...
+    </div>
+  }
+
+  <!-- ── Error ───────────────────────────────────────────────────────────── -->
+  @if (error && !loading) {
+    <div class="panel-error">
+      {{ error }}
+      <button (click)="loadSubmittals()">Retry</button>
+    </div>
+  }
+
+  @if (summary && !loading) {
+
+    <!-- ── Needs Attention Strip ──────────────────────────────────────────── -->
+    <div class="attention-strip">
+      <div class="attention-header">
+        <span class="attention-title">
+          <span class="attention-dot"
+            [class.dot-alert]="summary.attention.overdue > 0 || summary.attention.awaiting_review > 0">
+          </span>
+          Needs Attention
+        </span>
+      </div>
+
+      <div class="attention-cards">
+
+        <!-- Overdue -->
+        <div class="attention-card"
+          [class.attention-card--alert]="summary.attention.overdue > 0"
+          (click)="onStatusFilter('open')">
+          <span class="attention-value" [class.value-alert]="summary.attention.overdue > 0">
+            {{ summary.attention.overdue }}
+          </span>
+          <span class="attention-label">Overdue</span>
+          <span class="attention-sub">active + past due date</span>
+        </div>
+
+        <!-- Awaiting Review -->
+        <div class="attention-card"
+          [class.attention-card--warn]="summary.attention.awaiting_review > 0">
+          <span class="attention-value" [class.value-warn]="summary.attention.awaiting_review > 0">
+            {{ summary.attention.awaiting_review }}
+          </span>
+          <span class="attention-label">Awaiting Review</span>
+          <span class="attention-sub">sent but not returned</span>
+        </div>
+
+        <!-- High Priority -->
+        <div class="attention-card"
+          [class.attention-card--warn]="summary.attention.high_priority > 0">
+          <span class="attention-value" [class.value-warn]="summary.attention.high_priority > 0">
+            {{ summary.attention.high_priority }}
+          </span>
+          <span class="attention-label">High Priority</span>
+          <span class="attention-sub">not yet closed</span>
+        </div>
+
+        <!-- Avg Review Time -->
+        <div class="attention-card attention-card--neutral">
+          <span class="attention-value">
+            @if (summary.attention.avg_review_days !== null) {
+              {{ summary.attention.avg_review_days }}<span class="attention-unit">d</span>
+            } @else {
+              —
+            }
+          </span>
+          <span class="attention-label">Avg Review</span>
+          <span class="attention-sub">days sent → returned</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Status Bar Chart ───────────────────────────────────────────────── -->
+    <div class="section">
+      <span class="section-title">By Status</span>
+      <div class="bar-chart">
+        @for (s of statusBars; track s.key) {
+          <div class="bar-row">
+            <span class="bar-label">{{ s.label }}</span>
+            <div class="bar-track">
+              <div class="bar-fill" [class]="'bar-fill--' + s.key" [style.width]="s.width"></div>
+            </div>
+            <span class="bar-count">{{ s.count }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- ── Status Filter Tabs ─────────────────────────────────────────────── -->
+    <div class="filter-tabs">
+      @for (s of statusList; track s.key) {
+        <button
+          class="tab-btn"
+          [class.active]="activeStatus === s.key"
+          (click)="onStatusFilter(s.key)">
+          {{ s.value }}
+          @if (s.key !== 'all' && summary.by_status[s.key] !== undefined) {
+            <span class="tab-count">{{ summary.by_status[s.key] }}</span>
+          }
+        </button>
+      }
+    </div>
+
+    <!-- ── Submittals Table ───────────────────────────────────────────────── -->
+    <div class="submittals-table-wrap">
+      <table class="submittals-table">
+        <thead>
+          <tr>
+            <th class="col-risk">Risk</th>
+            <th class="col-number">#</th>
+            <th class="col-title">Title</th>
+            <th class="col-spec">Spec Section</th>
+            <th class="col-status">Status</th>
+            <th class="col-court">Ball in Court</th>
+            <th class="col-due">Due Date</th>
+            <th class="col-priority">Priority</th>
+            <th class="col-expand"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of summary.submittals; track s.id) {
+
+            <!-- Main row -->
+            <tr class="submittal-row"
+              [class.submittal-row--expanded]="isExpanded(s.id)"
+              [class.submittal-row--high]="s.risk_level === 'high'"
+              (click)="toggleRow(s.id)">
+
+              <td class="col-risk">
+                <span class="risk-badge" [ngClass]="riskClass(s.risk_level)">
+                  {{ riskLabel(s.risk_level) }}
+                </span>
+              </td>
+
+              <td class="col-number">
+                <span class="submittal-number">{{ s.submittal_number ?? '—' }}</span>
+              </td>
+
+              <td class="col-title">
+                <span class="submittal-title">{{ s.title || '—' }}</span>
+              </td>
+
+              <td class="col-spec">
+                @if (s.spec_identifier || s.spec_title) {
+                  <span class="spec-section">
+                    @if (s.spec_identifier) { <span class="spec-id">{{ s.spec_identifier }}</span> }
+                    {{ s.spec_title }}
+                  </span>
+                } @else {
+                  <span class="text-muted">—</span>
+                }
+              </td>
+
+              <td class="col-status">
+                <span class="status-badge" [ngClass]="statusClass(s.status)">
+                  {{ formatStatus(s.status) }}
+                </span>
+              </td>
+
+              <td class="col-court">
+                <span class="assigned-id" [title]="s.ball_in_court.join(', ')">
+                  {{ s.ball_in_court.length ? s.ball_in_court[0] : '—' }}
+                </span>
+              </td>
+
+              <td class="col-due"
+                [class.overdue]="s.effective_due_date && s.status !== 'closed'">
+                {{ formatDate(s.effective_due_date) }}
+              </td>
+
+              <td class="col-priority">
+                @if (s.priority) {
+                  <span class="priority-badge" [class.priority-high]="s.priority === 'High'">
+                    {{ s.priority }}
+                  </span>
+                } @else {
+                  <span class="text-muted">—</span>
+                }
+              </td>
+
+              <td class="col-expand">
+                <span class="expand-icon" [class.expand-icon--open]="isExpanded(s.id)">›</span>
+              </td>
+
+            </tr>
+
+            <!-- Expanded detail row -->
+            @if (isExpanded(s.id)) {
+              <tr class="detail-row">
+                <td colspan="9">
+                  <div class="detail-panel">
+                    <div class="detail-grid">
+
+                      @if (s.description) {
+                        <div class="detail-block detail-block--full">
+                          <span class="detail-label">Description</span>
+                          <p class="detail-text">{{ s.description }}</p>
+                        </div>
+                      }
+
+                      <div class="detail-block">
+                        <span class="detail-label">Package</span>
+                        <span class="detail-value">{{ s.package_title ?? '—' }}</span>
+                      </div>
+
+                      @if (s.subsection) {
+                        <div class="detail-block">
+                          <span class="detail-label">Subsection</span>
+                          <span class="detail-value">{{ s.subsection }}</span>
+                        </div>
+                      }
+
+                      <div class="detail-block">
+                        <span class="detail-label">Revision</span>
+                        <span class="detail-value">Rev {{ s.revision }}</span>
+                      </div>
+
+                      <div class="detail-block">
+                        <span class="detail-label">Sent to Review</span>
+                        <span class="detail-value">{{ formatDate(s.sent_to_review) }}</span>
+                      </div>
+
+                      <div class="detail-block">
+                        <span class="detail-label">Received from Review</span>
+                        <span class="detail-value">{{ formatDate(s.received_from_review) }}</span>
+                      </div>
+
+                      <div class="detail-block">
+                        <span class="detail-label">Published</span>
+                        <span class="detail-value">{{ formatDate(s.published_date) }}</span>
+                      </div>
+
+                      <div class="detail-block">
+                        <span class="detail-label">Created</span>
+                        <span class="detail-value">{{ formatDate(s.created_at) }}</span>
+                      </div>
+
+                      <div class="detail-block">
+                        <span class="detail-label">Last Updated</span>
+                        <span class="detail-value">{{ formatDate(s.updated_at) }}</span>
+                      </div>
+
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            }
+
+          } @empty {
+            <tr>
+              <td colspan="9" class="no-data">No submittals found</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+  }
+
+  <!-- ── Pagination ─────────────────────────────────────────────────────── -->
+  @if (totalSubmittals > pageSize) {
+    <div class="pagination">
+      <button class="page-btn" [disabled]="currentPage === 0" (click)="prevPage()">‹ Prev</button>
+      <span class="page-info">
+        Page {{ currentPageDisplay }} of {{ totalPages }}
+        <span class="page-total">({{ totalSubmittals }} total)</span>
+      </span>
+      <button class="page-btn" [disabled]="currentPageDisplay >= totalPages" (click)="nextPage()">Next ›</button>
+    </div>
+  }
+
+</div>
