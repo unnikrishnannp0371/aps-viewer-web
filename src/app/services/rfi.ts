@@ -32,7 +32,7 @@ export interface RfisByStatus {
   answered:  number;
   closed:    number;
   total:     number;
-  [key: string]: number;  // ← add this
+  [key: string]: number;
 }
 
 export interface RfiAttention {
