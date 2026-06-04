@@ -69,6 +69,7 @@ export class RfiPanel implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['projectId'] && !changes['projectId'].firstChange) {
+      this.rfiService.clearCache(this.projectId!);
       this.currentPage  = 0;
       this.activeStatus = 'all';
       this.activeFilter = {};
@@ -99,6 +100,8 @@ export class RfiPanel implements OnInit, OnChanges {
   loadRfis(): void {
     if (!this.projectId || !this.hubId) return;
 
+    const cached = this.rfiService.getCachedSummary(this.projectId);
+
     this.loading = true;
     this.error   = null;
 
@@ -110,7 +113,9 @@ export class RfiPanel implements OnInit, OnChanges {
       this.currentPage * this.pageSize
     ).subscribe({
       next: data => {
-        this.summary   = data;
+        this.summary = cached
+          ? { ...data, by_status: cached.by_status, attention: cached.attention }
+          : data;
         this.totalRfis = data.total;
         this.loading   = false;
         this.cdr.markForCheck();

@@ -30,6 +30,7 @@ export interface ProjectHealth {
   };
   signals: HealthSignal[];
   calculated_at: string;
+  data_available: boolean;
 }
 
 @Injectable({

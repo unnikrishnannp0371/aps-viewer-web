@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 export type RiskLevel = 'high' | 'medium' | 'low';
 
@@ -70,8 +70,17 @@ export interface SubmittalFilters {
 })
 export class SubmittalsService {
   private apiBaseUrl = '/api/v1';
+  private summaryCache = new Map<string, Pick<SubmittalSummary, 'by_status' | 'attention'>>();
 
   constructor(private http: HttpClient) {}
+
+  clearCache(projectId: string): void {
+    this.summaryCache.delete(projectId);
+  }
+
+  getCachedSummary(projectId: string) {
+    return this.summaryCache.get(projectId) ?? null;
+  }
 
   getSubmittalsSummary(
     projectId: string,
@@ -82,13 +91,23 @@ export class SubmittalsService {
     let params = new HttpParams()
       .set('limit', limit)
       .set('offset', offset);
-      
+
     if (filters.status_id) params = params.set('status_id', filters.status_id);
-    if (filters.spec_id) params = params.set('spec_id', filters.spec_id);
+    if (filters.spec_id)   params = params.set('spec_id',   filters.spec_id);
 
     return this.http.get<SubmittalSummary>(
       `${this.apiBaseUrl}/projects/${projectId}/submittals`,
       { withCredentials: true, params }
-    )
+    ).pipe(
+      tap(data => {
+        const isUnfiltered = !filters.status_id && !filters.spec_id;
+        if (isUnfiltered) {
+          this.summaryCache.set(projectId, {
+            by_status: data.by_status,
+            attention: data.attention
+          });
+        }
+      })
+    );
   }
 }

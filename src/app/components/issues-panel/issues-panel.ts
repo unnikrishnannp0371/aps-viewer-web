@@ -79,6 +79,7 @@ export class IssuesPanel implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['projectId'] && !changes['projectId'].firstChange) {
+      this.issuesService.clearCache(this.projectId!);
       this.currentPage   = 0;
       this.activeStatus  = 'all';
       this.activeFilter  = {};
@@ -108,6 +109,10 @@ export class IssuesPanel implements OnInit, OnChanges {
   loadIssues(): void {
     if (!this.projectId || !this.hubId) return;
 
+    // Use cached summary data if available — avoids re-fetching
+    // by_status, by_type, attention on pagination/filter changes
+    const cached = this.issuesService.getCachedSummary(this.projectId);
+
     this.loading = true;
     this.error   = null;
 
@@ -119,7 +124,10 @@ export class IssuesPanel implements OnInit, OnChanges {
       this.currentPage * this.pageSize
     ).subscribe({
       next: data => {
-        this.summary     = data;
+        this.summary = cached
+          ? { ...data, by_status: cached.by_status, by_type: cached.by_type,
+              by_assignee: cached.by_assignee, attention: cached.attention }
+          : data;
         this.totalIssues = data.total;
         this.loading     = false;
         this.cdr.markForCheck();
