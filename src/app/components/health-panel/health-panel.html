@@ -35,113 +35,112 @@
 
   <!-- ── Content ─────────────────────────────────────────────────────────── -->
   @if (health && !isLoading) {
-
-    <div class="health-body">
-
-      <!-- Left — Score ring + grade -->
-      <div class="score-section">
-
-        <!-- Score ring — SVG circle with stroke-dashoffset driven by score -->
-        <div class="score-ring-wrapper">
-          <svg class="score-ring" viewBox="0 0 120 120">
-            <!-- Background track -->
-            <circle
-              class="ring-track"
-              cx="60" cy="60" r="50"
-              fill="none"
-              stroke="#f3f4f6"
-              stroke-width="10" />
-            <!-- Score arc -->
-            <circle
-              class="ring-fill"
-              cx="60" cy="60" r="50"
-              fill="none"
-              [attr.stroke]="gradeColor(health.grade)"
-              stroke-width="10"
-              stroke-linecap="round"
-              stroke-dasharray="314"
-              [attr.stroke-dashoffset]="314 - (314 * health.overall / 100)"
-              transform="rotate(-90 60 60)" />
-          </svg>
-
-          <!-- Score number in the centre of the ring -->
-          <div class="score-centre">
-            <span
-              class="score-number"
-              [style.color]="gradeColor(health.grade)">
-              {{ health.overall }}
-            </span>
-            <span class="score-out-of">/ 100</span>
-          </div>
-        </div>
-
-        <!-- Grade badge + label below the ring -->
-        <div
-          class="grade-badge"
-          [style.background]="gradeColor(health.grade) + '22'"
-          [style.color]="gradeColor(health.grade)"
-          [style.borderColor]="gradeColor(health.grade) + '55'">
-          Grade {{ health.grade }}
-        </div>
-        <div class="health-label">{{ health.label }}</div>
-
+    @if (!health.data_available) {
+      <div class="panel-empty">
+        <span class="empty-icon">📊</span>
+        <p class="empty-title">Not enough data to calculate health</p>
+        <p class="empty-sub">Health score appears once Issues, RFIs, or Submittals have data.</p>
       </div>
+    } @else {
+      <div class="health-body">
 
-      <!-- Right — Domain scores + signals -->
-      <div class="detail-section">
+        <!-- Left — Score ring + grade -->
+        <div class="score-section">
 
-        <!-- Domain breakdown bars -->
-        <div class="domain-section">
-          <h3 class="section-title">Domain Scores</h3>
-          <div class="domain-list">
-            @for (domain of domainEntries; track domain.key) {
-              <div class="domain-row">
-                <div class="domain-meta">
-                  <span class="domain-label">{{ domain.label }}</span>
-                  <span class="domain-weight">{{ domain.weight }}% weight</span>
-                </div>
-                <div class="domain-bar-track">
-                  <div
-                    class="domain-bar-fill"
-                    [style.width]="domainWidth(domain.score)"
-                    [style.background]="domainColor(domain.score)">
+          <div class="score-ring-wrapper">
+            <svg class="score-ring" viewBox="0 0 120 120">
+              <circle
+                class="ring-track"
+                cx="60" cy="60" r="50"
+                fill="none"
+                stroke="#f3f4f6"
+                stroke-width="10" />
+              <circle
+                class="ring-fill"
+                cx="60" cy="60" r="50"
+                fill="none"
+                [attr.stroke]="gradeColor(health.grade)"
+                stroke-width="10"
+                stroke-linecap="round"
+                stroke-dasharray="314"
+                [attr.stroke-dashoffset]="314 - (314 * health.overall / 100)"
+                transform="rotate(-90 60 60)" />
+            </svg>
+
+            <div class="score-centre">
+              <span
+                class="score-number"
+                [style.color]="gradeColor(health.grade)">
+                {{ health.overall }}
+              </span>
+              <span class="score-out-of">/ 100</span>
+            </div>
+          </div>
+
+          <div
+            class="grade-badge"
+            [style.background]="gradeColor(health.grade) + '22'"
+            [style.color]="gradeColor(health.grade)"
+            [style.borderColor]="gradeColor(health.grade) + '55'">
+            Grade {{ health.grade }}
+          </div>
+          <div class="health-label">{{ health.label }}</div>
+
+        </div>
+
+        <!-- Right — Domain scores + signals -->
+        <div class="detail-section">
+
+          <div class="domain-section">
+            <h3 class="section-title">Domain Scores</h3>
+            <div class="domain-list">
+              @for (domain of domainEntries; track domain.key) {
+                <div class="domain-row">
+                  <div class="domain-meta">
+                    <span class="domain-label">{{ domain.label }}</span>
+                    <span class="domain-weight">{{ domain.weight }}% weight</span>
                   </div>
+                  <div class="domain-bar-track">
+                    <div
+                      class="domain-bar-fill"
+                      [style.width]="domainWidth(domain.score)"
+                      [style.background]="domainColor(domain.score)">
+                    </div>
+                  </div>
+                  <span
+                    class="domain-score"
+                    [style.color]="domainColor(domain.score)">
+                    {{ domain.score }}
+                  </span>
                 </div>
-                <span
-                  class="domain-score"
-                  [style.color]="domainColor(domain.score)">
-                  {{ domain.score }}
-                </span>
-              </div>
-            }
+              }
+            </div>
           </div>
-        </div>
 
-        <!-- Signals -->
-        <div class="signals-section">
-          <h3 class="section-title">Signals</h3>
-          <div class="signals-list">
-            @for (signal of health.signals; track signal.key) {
-              <div class="signal-row">
-                <span
-                  class="signal-dot"
-                  [style.background]="severityColor(signal.severity)">
-                </span>
-                <span class="signal-label">{{ signal.label }}</span>
-                <span
-                  class="signal-value"
-                  [style.color]="severityColor(signal.severity)">
-                  {{ signal.value }}
-                </span>
-              </div>
-            }
+          <div class="signals-section">
+            <h3 class="section-title">Signals</h3>
+            <div class="signals-list">
+              @for (signal of health.signals; track signal.key) {
+                <div class="signal-row">
+                  <span
+                    class="signal-dot"
+                    [style.background]="severityColor(signal.severity)">
+                  </span>
+                  <span class="signal-label">{{ signal.label }}</span>
+                  <span
+                    class="signal-value"
+                    [style.color]="severityColor(signal.severity)">
+                    {{ signal.value }}
+                  </span>
+                </div>
+              }
+            </div>
           </div>
+
         </div>
 
       </div>
-
-    </div>
-
+    }
   }
 
 </div>

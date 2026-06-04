@@ -2,7 +2,7 @@
 
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 export type RiskLevel = 'high' | 'medium' | 'low';
 
@@ -68,8 +68,13 @@ export interface IssueFilters {
 @Injectable({ providedIn: 'root' })
 export class IssuesService {
   private apiBaseUrl = '/api/v1';
+  private summaryCache = new Map<string, Pick<IssuesSummary, 'by_status' | 'by_type' | 'by_assignee' | 'attention'>>();
 
   constructor(private http: HttpClient) {}
+
+  clearCache(projectId: string): void {
+    this.summaryCache.delete(projectId);
+  }
 
   getIssuesSummary(
     hubId:     string,
@@ -89,13 +94,22 @@ export class IssuesService {
     return this.http.get<IssuesSummary>(
       `${this.apiBaseUrl}/projects/${projectId}/issues`,
       { withCredentials: true, params }
+    ).pipe(
+      tap(data => {
+        const isUnfiltered = !filters.status && !filters.assigned_to;
+        if (isUnfiltered) {
+          this.summaryCache.set(projectId, {
+            by_status:   data.by_status,
+            by_type:     data.by_type,
+            by_assignee: data.by_assignee,
+            attention:   data.attention
+          });
+        }
+      })
     );
   }
 
-  getIssue(projectId: string, issueId: string): Observable<Issue> {
-    return this.http.get<Issue>(
-      `${this.apiBaseUrl}/projects/${projectId}/issues/${issueId}`,
-      { withCredentials: true }
-    );
+  getCachedSummary(projectId: string) {
+    return this.summaryCache.get(projectId) ?? null;
   }
 }

@@ -57,6 +57,7 @@ export class SubmittalsPanel implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['projectId'] && !changes['projectId'].firstChange) {
+      this.submittalService.clearCache(this.projectId!);
       this.currentPage  = 0;
       this.activeStatus = 'all';
       this.activeFilter = {};
@@ -86,6 +87,8 @@ export class SubmittalsPanel implements OnInit, OnChanges {
   loadSubmittals(): void {
     if (!this.projectId) return;
 
+    const cached = this.submittalService.getCachedSummary(this.projectId);
+
     this.loading = true;
     this.error   = null;
 
@@ -96,9 +99,11 @@ export class SubmittalsPanel implements OnInit, OnChanges {
       this.currentPage * this.pageSize
     ).subscribe({
       next: data => {
-        this.summary   = data;
+        this.summary = cached
+          ? { ...data, by_status: cached.by_status, attention: cached.attention }
+          : data;
         this.totalSubmittals = data.total;
-        this.loading   = false;
+        this.loading         = false;
         this.cdr.markForCheck();
       },
       error: () => {

@@ -2,7 +2,7 @@
 
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 export type RiskLevel = 'high' | 'medium' | 'low';
 
@@ -59,8 +59,17 @@ export interface RfiFilters {
 @Injectable({ providedIn: 'root' })
 export class RfiService {
   private apiBaseUrl = '/api/v1';
+  private summaryCache = new Map<string, Pick<RfiSummary, 'by_status' | 'attention'>>();
 
   constructor(private http: HttpClient) {}
+
+  clearCache(projectId: string): void {
+    this.summaryCache.delete(projectId);
+  }
+
+  getCachedSummary(projectId: string) {
+    return this.summaryCache.get(projectId) ?? null;
+  }
 
   getRfisSummary(
     hubId:     string,
@@ -80,6 +89,16 @@ export class RfiService {
     return this.http.get<RfiSummary>(
       `${this.apiBaseUrl}/projects/${projectId}/rfis`,
       { withCredentials: true, params }
+    ).pipe(
+      tap(data => {
+        const isUnfiltered = !filters.status && !filters.title;
+        if (isUnfiltered) {
+          this.summaryCache.set(projectId, {
+            by_status: data.by_status,
+            attention: data.attention
+          });
+        }
+      })
     );
   }
 }
