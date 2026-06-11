@@ -2,8 +2,8 @@
 
 import { HttpClient } from '@angular/common/http';
 import {
-  ChangeDetectorRef, Component, ElementRef, Input,
-  OnChanges, OnDestroy, SimpleChanges, ViewChild
+  ChangeDetectorRef, Component, ElementRef, EventEmitter, Input,
+  OnChanges, OnDestroy, Output, SimpleChanges, ViewChild
 } from '@angular/core';
 
 declare const Autodesk: any;
@@ -11,8 +11,10 @@ declare const Autodesk: any;
 export interface ViewerTarget {
   urn:        string;
   pushpin: {
-    location: { x: number; y: number; z: number } | null;
-    objectId: number | null;
+    location:      { x: number; y: number; z: number } | null;
+    objectId:      number | null;
+    viewable_guid: string | null;
+    seed_urn:      string | null;
   } | null;
   issueTitle: string;
 }
@@ -31,6 +33,8 @@ export class DashboardViewer implements OnChanges, OnDestroy {
   viewerContainer!: ElementRef;
 
   @Input() target: ViewerTarget | null = null;
+
+  @Output() viewerClosed = new EventEmitter<void>();
 
   isVisible        = false;
   isLoading        = false;
@@ -79,7 +83,6 @@ export class DashboardViewer implements OnChanges, OnDestroy {
       { withCredentials: true }
     ).subscribe({
       next: (response) => {
-        // Bug 1 fix: Rails returns access_token (snake_case), not accessToken
         this.accessToken = response.access_token;
         this.loadSdk();
       },
@@ -138,15 +141,10 @@ export class DashboardViewer implements OnChanges, OnDestroy {
   private loadModel(urn: string): void {
     this.isLoading = true;
 
-    // The APS Viewer Document.load expects: "urn:<base64url_encoded_raw_urn>"
-    // The raw URN from ACC looks like: "urn:adsk.wipprod:dm.lineage:KrzcyB5IQc2AWj06-w0xKQ"
-    // We must Base64 encode the entire raw URN, then prefix with "urn:"
-    // btoa() does standard Base64 — viewer accepts both standard and URL-safe
-    const encoded    = btoa(urn);
-    const documentId = `urn:${encoded}`;
-
-    console.log('Raw URN:', urn);
-    console.log('Document ID:', documentId);
+    // Use seed_urn from viewerState if available — it's already base64-encoded
+    // Fall back to base64-encoding the lineage URN
+    const seedUrn    = this.target?.pushpin?.seed_urn;
+    const documentId = seedUrn ? `urn:${seedUrn}` : `urn:${btoa(urn)}`;
 
     Autodesk.Viewing.Document.load(
       documentId,
@@ -159,14 +157,21 @@ export class DashboardViewer implements OnChanges, OnDestroy {
   }
 
   private onDocumentLoaded(doc: any, urn: string): void {
-    const root     = doc.getRoot();
-    const viewable = root.search({ type: 'geometry', role: '3d' })[0]
-                  ?? root.getDefaultGeometry();
+    const root = doc.getRoot();
+    const guid = this.target?.pushpin?.viewable_guid;
+
+    let viewable;
+    if (guid) {
+      viewable = root.search({ guid })[0];
+    }
+    viewable = viewable
+      ?? root.search({ type: 'geometry', role: '3d' })[0]
+      ?? root.getDefaultGeometry();
 
     this.viewer.loadDocumentNode(doc, viewable).then(() => {
       this.currentUrn = urn;
       this.isLoading  = false;
-
+      this.cdr.detectChanges();
       this.viewer.addEventListener(
         Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
         () => this.flyToPushpin(this.target?.pushpin ?? null),
@@ -200,6 +205,7 @@ export class DashboardViewer implements OnChanges, OnDestroy {
   closeViewer(): void {
     this.isVisible = false;
     if (this.viewer) this.viewer.isolate([]);
+    this.viewerClosed.emit();
   }
 
   resetView(): void {
