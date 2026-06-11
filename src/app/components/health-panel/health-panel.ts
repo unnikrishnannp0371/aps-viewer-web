@@ -27,6 +27,9 @@ export class HealthPanel implements OnInit, OnChanges {
   isLoading = false;
   error: string | null = null;
 
+  readonly domainOrder = ['issues', 'rfis', 'submittals', 'clashes'];
+  expandedDomain: string | null = 'issues';
+
   constructor(
     private healthService: HealthService,
     private cdr: ChangeDetectorRef
@@ -110,12 +113,25 @@ export class HealthPanel implements OnInit, OnChanges {
   // Domain entries as array so template can iterate
   get domainEntries() {
     if (!this.health) return [];
-    return Object.entries(this.health.domain_scores).map(([key, ds]) => ({
-      key,
-      label:  this.domainLabel(key),
-      score:  ds.score,
-      weight: Math.round(ds.weight * 100)
-    }));
+    return this.domainOrder.map(key => {
+      const ds = this.health!.domain_scores[key as keyof typeof this.health.domain_scores];
+      return {
+        key,
+        label:   this.domainLabel(key),
+        score:   ds.score,
+        weight:  Math.round(ds.weight * 100),
+        signals: this.signalsForDomain(key)
+      };
+    });
+  }
+
+  toggleDomain(key: string): void {
+    this.expandedDomain = this.expandedDomain === key ? null : key;
+  }
+
+  signalsForDomain(domain: string): HealthSignal[] {
+    if (!this.health) return [];
+    return this.health.signals.filter(s => s.domain === domain);
   }
 
   // Format the calculated_at timestamp

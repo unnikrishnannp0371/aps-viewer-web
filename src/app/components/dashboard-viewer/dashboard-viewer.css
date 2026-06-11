@@ -14,7 +14,6 @@
 .viewer-panel {
   background: #ffffff;
   border-radius: 8px;
-  border-left: 4px solid #0696d7;   /* blue = viewer, not red like issues */
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
   font-family: 'IBM Plex Sans', sans-serif;
   overflow: hidden;
@@ -171,16 +170,13 @@
 }
 
 /* ── Viewer Container ─────────────────────────────────────────────────────── */
-
 .viewer-container {
-  /* Fixed height — the APS Viewer needs explicit dimensions */
   width: 100%;
-  height: 500px;
+  height: calc(100vh - 180px); /* viewport minus header + health panel */
 }
 
-/* Hide the container while loading/error without removing from DOM.
-   Removing from DOM would destroy the WebGL context. */
-.viewer-container.hidden {
-  height: 0;
-  overflow: hidden;
+.viewer-panel.visible {
+  max-height: calc(100vh - 180px);
+  opacity: 1;
+  pointer-events: all;
 }

@@ -98,9 +98,6 @@ export class Viewer implements OnInit, OnDestroy {
           const viewables3D = root.search({ type: 'geometry', role: '3d' });
           const viewables2D = root.search({ type: 'geometry', role: '2d' });
 
-          console.log('3D views:', viewables3D.length);
-          console.log('2D sheets:', viewables2D.length);
-
           this.currentDoc = doc;
           this.viewables3D = viewables3D;
           this.viewables2D = viewables2D;

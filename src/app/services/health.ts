@@ -16,6 +16,7 @@ export interface HealthSignal {
   label: string;
   value: number;
   severity: 'good' | 'warning' | 'critical';
+  domain: 'issues' | 'rfis' | 'submittals' | 'clashes';
 }
 
 export interface ProjectHealth {

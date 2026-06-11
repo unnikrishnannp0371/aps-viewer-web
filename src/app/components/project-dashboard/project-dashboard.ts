@@ -9,8 +9,8 @@ import { DashboardViewer, ViewerTarget } from '../dashboard-viewer/dashboard-vie
 import { HealthPanel } from '../health-panel/health-panel';
 import { RfiPanel } from '../rfi-panel/rfi-panel';
 import { SubmittalsPanel } from '../submittals-panel/submittals-panel';
-export type DashboardTab = 'issues' | 'rfi' | 'submittals' | 'clashes';
 
+export type DashboardTab = 'issues' | 'rfi' | 'submittals' | 'clashes';
 export interface Tab {
   key:     DashboardTab;
   label:   string;
@@ -85,8 +85,9 @@ export class ProjectDashboard implements OnInit {
   // ── Tab switching ─────────────────────────────────────────────────────────
 
   selectTab(tab: Tab): void {
-    if (!tab.ready) return;  // ignore clicks on stub tabs
+    if (!tab.ready) return;
     this.activeTab = tab.key;
+    this.viewerTarget = null;
   }
 
   isActive(key: DashboardTab): boolean {
@@ -111,5 +112,9 @@ export class ProjectDashboard implements OnInit {
       pushpin:    event.issue.pushpin,
       issueTitle: event.issue.title
     };
+  }
+
+  onViewerClosed(): void {
+    this.viewerTarget = null;
   }
 }

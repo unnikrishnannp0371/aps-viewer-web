@@ -7,8 +7,10 @@ import { Observable, tap } from 'rxjs';
 export type RiskLevel = 'high' | 'medium' | 'low';
 
 export interface IssuePushpin {
-  location: { x: number; y: number; z: number } | null;
-  objectId: number | null;
+  location:      { x: number; y: number; z: number } | null;
+  objectId:      number | null;
+  viewable_guid: string | null;
+  seed_urn:      string | null;
 }
 
 export interface Issue {

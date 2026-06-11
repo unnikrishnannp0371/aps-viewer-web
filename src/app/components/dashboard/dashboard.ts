@@ -60,9 +60,6 @@ export class Dashboard implements OnInit {
     // This is the viewer integration hook.
     // In Step 6 (Clash panel) we'll flesh this out with the full Viewer API.
     // For now, log it so you can verify the data shape is correct.
-    console.log('Fly to issue:', event.issue.title);
-    console.log('Pushpin location:', event.issue.pushpin?.location);
-    console.log('Viewable ID:', event.viewableId);
     // TODO Step 6: viewerService.flyTo(event.issue.pushpin, event.viewableId)
   }
 }
