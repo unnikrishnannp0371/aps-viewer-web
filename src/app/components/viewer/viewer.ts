@@ -24,6 +24,12 @@ export class Viewer implements OnInit, OnDestroy {
   viewables2D: any[] = [];
   activeTab: '3d' | '2d' = '3d';
   activeViewIndex = 0;
+  showSharePanel = false;
+  shareUrl: string | null = null;
+  shareExpiry: number = 0;
+  isGeneratingShare = false;
+  shareError: string | null = null;
+  copied = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -33,35 +39,60 @@ export class Viewer implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const token = this.route.snapshot.paramMap.get('token');
-    if (!token) {
+    const urn = this.route.snapshot.paramMap.get('urn');
+
+    if (urn) {
+      const fileName = this.route.snapshot.queryParamMap.get('file_name') || 'Model';
+      this.translationService.getAuthViewerData(urn, fileName).subscribe({
+      next: (data) => {
+        console.log('data received', data);
+        console.log('isLoading before set', this.isLoading);
+        this.viewerData = data;
+        this.isLoading = false;
+        console.log('isLoading after set', this.isLoading);
+        this.cdr.detectChanges();
+        console.log('detectChanges called');
+        this.loadViewerSDK(data);
+      },
+        error: () => {
+          this.error = 'Could not load the viewer.';
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
+      });
+    } else if (token) {
+      this.translationService.getViewerData(token).subscribe({
+        next: (data) => {
+          this.viewerData = data;
+          this.isLoading = false;
+          this.cdr.detectChanges();
+          this.loadViewerSDK(data);
+        },
+        error: (err) => {
+          if (err.status === 404) {
+            this.error = 'This link does not exist or has been removed.';
+          } else if (err.status === 410) {
+            this.error = 'This link has expired.';
+          } else {
+            this.error = 'Could not load the viewer.';
+          }
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
+      });
+    } else {
       this.error = 'Invalid viewer link.';
       this.isLoading = false;
       this.cdr.detectChanges();
-      return;
     }
-
-    this.translationService.getViewerData(token).subscribe({
-      next: (data) => {
-        this.viewerData = data;
-        this.isLoading = false;
-        this.cdr.detectChanges();
-        this.loadViewerSDK(data);
-      },
-      error: (err) => {
-        if (err.status === 404) {
-          this.error = 'This link does not exist or has been removed.';
-        } else if (err.status === 410) {
-          this.error = 'This link has expired.';
-        } else {
-          this.error = 'Could not load the viewer.';
-        }
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      }
-    });
   }
 
   loadViewerSDK(data: ViewerData): void {
+    if (typeof Autodesk !== 'undefined') {
+      this.initializeViewer(data);
+      return;
+    }
+
     const script = document.createElement('script');
     script.src = 'https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.min.js';
     script.onload = () => this.initializeViewer(data);
@@ -110,9 +141,10 @@ export class Viewer implements OnInit, OnDestroy {
               Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
               () => {
                 const modelStructure = this.viewer.getExtension('Autodesk.ModelStructure');
-                if (modelStructure) {
-                  modelStructure.activate();
-                }
+                if (modelStructure) modelStructure.activate();
+
+                const propertiesPanel = this.viewer.getExtension('Autodesk.PropertiesManager');
+                if (propertiesPanel) propertiesPanel.activate();
               }
             );
             this.cdr.detectChanges();
@@ -144,9 +176,7 @@ export class Viewer implements OnInit, OnDestroy {
           console.warn(`Could not load extension ${ext}:`, err);
         })
       )
-    ).then(() => {
-      console.log('All extensions loaded');
-    });
+    );
   }
 
   ngOnDestroy(): void {
@@ -164,6 +194,52 @@ export class Viewer implements OnInit, OnDestroy {
 
     this.viewer.loadDocumentNode(this.currentDoc, viewable).then(() => {
       this.loadExtensions();
+    });
+  }
+
+  onShareToggle(): void {
+    this.showSharePanel = !this.showSharePanel;
+    this.shareUrl = null;
+    this.shareError = null;
+    this.copied = false;
+    this.shareExpiry = 0;
+    this.cdr.detectChanges();
+  }
+
+  onGenerateShare(): void {
+    if (!this.viewerData) return;
+    this.isGeneratingShare = true;
+    this.shareError = null;
+    this.cdr.detectChanges();
+
+    this.translationService.share(
+      this.viewerData.urn,
+      this.viewerData.file_name,
+      this.shareExpiry
+    ).subscribe({
+      next: (result) => {
+        this.shareUrl = result.url;
+        this.isGeneratingShare = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.shareError = 'Could not generate share link.';
+        this.isGeneratingShare = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  onCopy(): void {
+    if (!this.shareUrl) return;
+    navigator.clipboard.writeText(this.shareUrl).then(() => {
+      this.copied = true;
+      this.cdr.detectChanges();
+      setTimeout(() => {
+        this.copied = false;
+        this.showSharePanel = false;
+        this.cdr.detectChanges();
+      }, 1500);
     });
   }
 }

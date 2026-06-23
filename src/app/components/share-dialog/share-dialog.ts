@@ -138,6 +138,8 @@ export class ShareDialog implements OnInit{
       next: (result) => {
         this.shareResult = result;
         this.state = 'done';
+        window.open(result.url, '_blank')
+        this.closed.emit();
         this.cdr.detectChanges();
       },
       error: () => {

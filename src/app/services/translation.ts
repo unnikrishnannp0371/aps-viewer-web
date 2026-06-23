@@ -17,10 +17,11 @@ export interface ShareResponse {
 }
 
 export interface ViewerData {
-  urn: string
-  token: string
+  urn: string;
+  token: string;
   file_name: string;
   expires_at: string;
+  is_shared?: boolean;
 }
 
 export interface Version {
@@ -62,5 +63,12 @@ export class TranslationService {
 
   getVersions(projectId: string, itemId: string): Observable<Version[]> {
     return this.http.get<Version[]>(`${this.apiBaseUrl}/projects/${projectId}/items/${itemId}/versions`);
+  }
+
+  getAuthViewerData(urn: string, fileName: string): Observable<ViewerData> {
+    return this.http.get<ViewerData>(
+      `/api/v1/viewer/auth/${urn}`,
+      { params: { file_name: fileName }, withCredentials: true }
+    );
   }
 }

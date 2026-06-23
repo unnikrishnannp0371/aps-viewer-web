@@ -1,61 +1,82 @@
 <div class="browser-page">
-    <div class="browser-card">
-        <div class="browser-header">
-            <h2 class="browser-title">File Browser</h2>
-        </div>
+  <div class="browser-card">
 
-        @if (breadcrumbs.length > 0) {
-            <app-breadcrumb
-                [breadcrumbs]="breadcrumbs"
-                (breadcrumbClick)="onBreadcrumbClick($event)" />
-        }
-
-        @if (isLoading) {
-          <div class="browser-loading">
-            <div class="spinner"></div>
-              <span>Loading...</span>
-          </div>
-        }
-
-        @if (error) {
-          <div class="browser-error">{{ error }}</div>
-        }
-
-        @if (!isLoading && !error) {
-          @if (level === 'hubs') {
-            <app-hub-list [hubs]="hubs" (hubSelected)="onHubSelected($event)" />
-          }
-          @if (level === 'projects') {
-            <app-project-list [projects]="projects" (projectSelected)="onProjectSelected($event)" />
-          }
-          @if (level === 'folders' || level === 'contents') {
-            <app-folder-list
-              [items]="level === 'folders' ? folders : contents"
-              [level]="level"
-              [selectedFile]="selectedFile"
-              [projectId]="selectedProject?.project_id || ''"
-              (folderSelected)="onFolderSelected($event)"
-              (fileSelected)="onFileSelected($event)"
-            />
-          }
-        }
-
-        @if (selectedFile) {
-          <div class="action-bar">
-            <div class="selected-file">
-              <span class="selected-label">Selected:</span>
-                <span class="selected-name">{{ selectedFile.name }}</span>
-            </div>
-            <button class="translate-btn" (click)="onTranslateAndShare()">
-              Translate and Share
-            </button>
-          </div>
-        }
+    <div class="browser-header">
+      <h2 class="browser-title">File Browser</h2>
     </div>
-    @if (showShareDialog && selectedFile) {
-      <app-share-dialog
-        [file]="selectedFile"
-        (closed)="onDialogClosed()"
-      />
+
+    @if (breadcrumbs.length > 0) {
+      <app-breadcrumb
+        [breadcrumbs]="breadcrumbs"
+        (breadcrumbClick)="onBreadcrumbClick($event)" />
     }
+
+    @if (isLoading) {
+      <div class="browser-loading">
+        <div class="spinner"></div>
+        <span>Loading...</span>
+      </div>
+    }
+
+    @if (error) {
+      <div class="browser-error">{{ error }}</div>
+    }
+
+    @if (!isLoading && !error) {
+      @if (level === 'hubs') {
+        <app-hub-list [hubs]="hubs" (hubSelected)="onHubSelected($event)" />
+      }
+      @if (level === 'projects') {
+        <app-project-list [projects]="projects" (projectSelected)="onProjectSelected($event)" />
+      }
+      @if (level === 'folders' || level === 'contents') {
+        <app-folder-list
+          [items]="level === 'folders' ? folders : contents"
+          [level]="level"
+          [selectedFile]="selectedFile"
+          [projectId]="selectedProject?.project_id || ''"
+          (folderSelected)="onFolderSelected($event)"
+          (fileSelected)="onFileSelected($event)"
+        />
+      }
+    }
+
+    @if (selectedFile) {
+      <div class="action-bar">
+        <div class="selected-file">
+          <span class="selected-label">Selected:</span>
+          <span class="selected-name">{{ selectedFile.name }}</span>
+        </div>
+        @if (isOpeningViewer) {
+          <div class="viewer-loading">
+            <div class="spinner"></div>
+            <span>Opening viewer...</span>
+          </div>
+        }
+        @if (viewerError) {
+          <span class="viewer-error">{{ viewerError }}</span>
+        }
+      </div>
+    }
+
+    @if (showVersionPicker) {
+      <div class="version-overlay" (click)="onVersionPickerClose()">
+        <div class="version-card" (click)="$event.stopPropagation()">
+          <div class="version-card-header">
+            <span class="version-card-title">Select Version</span>
+            <button class="version-close-btn" (click)="onVersionPickerClose()">✕</button>
+          </div>
+          <div class="version-list">
+            @for (v of pickerVersions; track v.version_id) {
+              <div class="version-item" (click)="onVersionPicked(v)">
+                <span class="version-number">Version {{ v.version_number }}</span>
+                <span class="version-meta">{{ formatVersionDate(v.created_at) }} · {{ v.created_by }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+  </div>
 </div>

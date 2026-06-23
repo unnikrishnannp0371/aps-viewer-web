@@ -30,6 +30,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'view/auth/:urn',
+    loadComponent: () => import('./components/viewer/viewer').then(m => m.Viewer),
+    canActivate: [authGuard]
+  },
+  {
     path: 'view/:token',
     loadComponent: () => import('./components/viewer/viewer').then(m => m.Viewer)
   },

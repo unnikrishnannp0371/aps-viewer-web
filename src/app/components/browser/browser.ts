@@ -5,7 +5,7 @@ import { HubList } from './hub-list/hub-list';
 import { ProjectList } from './project-list/project-list';
 import { FolderList } from './folder-list/folder-list';
 import { Breadcrumb } from './breadcrumb/breadcrumb';
-import { ShareDialog } from '../share-dialog/share-dialog';
+import { TranslationService } from '../../services/translation';
 
 
 type BrowserLevel = 'hubs' | 'projects' | 'folders' | 'contents'
@@ -13,7 +13,7 @@ type BrowserLevel = 'hubs' | 'projects' | 'folders' | 'contents'
 @Component({
   standalone: true,
   selector: 'app-browser',
-  imports: [CommonModule, HubList, ProjectList, FolderList, Breadcrumb, ShareDialog],
+  imports: [CommonModule, HubList, ProjectList, FolderList, Breadcrumb],
   templateUrl: './browser.html',
   styleUrl: './browser.css',
 })
@@ -35,11 +35,19 @@ export class Browser implements OnInit {
   isLoading = false;
   error: string | null = null;
 
-  showShareDialog = false;
+  isOpeningViewer = false;
+  viewerError: string | null = null;
+  private pollCount = 0;
+  private maxPolls = 30;
+
+  showVersionPicker = false;
+  pickerVersions: any[] = [];
+  private pendingFile: FolderItem | null = null;
 
   constructor(
     private browserServce: BrowserService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translationService: TranslationService
   ) {}
 
   ngOnInit(): void {
@@ -145,11 +153,6 @@ export class Browser implements OnInit {
     });
   }
 
-  onFileSelected(file: FolderItem): void {
-    this.selectedFile = file;
-    this.cdr.detectChanges();
-  }
-
   onBreadcrumbClick(crumb: BreadcrumbItem): void {
     if (crumb.level === 'root') {
       this.selectedHub = null;
@@ -167,11 +170,105 @@ export class Browser implements OnInit {
     }
   }
 
-  onTranslateAndShare(): void {
-    this.showShareDialog = true;
+  onFileSelected(file: FolderItem): void {
+    this.selectedFile = file;
+    this.isOpeningViewer = true;
+    this.viewerError = null;
+    this.pollCount = 0;
+    this.cdr.detectChanges();
+    this.loadVersionAndOpen(file)
   }
 
-  onDialogClosed(): void {
-    this.showShareDialog = false;
+  private loadVersionAndOpen(file: FolderItem): void {
+    this.translationService.getVersions(file.project_id, file.content_id).subscribe({
+      next: (versions) => {
+        if (versions.length === 0) {
+          if (file.tip_urn) {
+            this.checkAndOpen(file.tip_urn, file.name);
+          } else {
+            this.viewerError = 'No versions available for this file.';
+            this.isOpeningViewer = false;
+            this.cdr.detectChanges();
+          }
+          return;
+        }
+
+        if (versions.length === 1) {
+          this.checkAndOpen(versions[0].version_urn, file.name);
+          return;
+        }
+
+        // Multiple versions — show picker
+        this.pickerVersions = versions;
+        this.pendingFile = file;
+        this.isOpeningViewer = false;
+        this.showVersionPicker = true;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        if (file.tip_urn) {
+          this.checkAndOpen(file.tip_urn, file.name);
+        } else {
+          this.viewerError = 'Failed to load file versions.';
+          this.isOpeningViewer = false;
+          this.cdr.detectChanges();
+        }
+      }
+    });
+  }
+
+  private checkAndOpen(urn: string, fileName: string): void {
+    this.pollCount++;
+    if (this.pollCount > this.maxPolls) {
+      this.viewerError = 'Translation is taking too long. Please try again.';
+      this.isOpeningViewer = false;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.translationService.checkStatus(urn).subscribe({
+      next: (status) => {
+        if (status.status === 'success') {
+          const encodedName = encodeURIComponent(fileName);
+          window.open(`/view/auth/${urn}?file_name=${encodedName}`, '_blank');
+          this.isOpeningViewer = false;
+          this.cdr.detectChanges();
+        } else if (status.status === 'inprogress') {
+          this.cdr.detectChanges();
+          setTimeout(() => this.checkAndOpen(urn, fileName), 10000);
+        } else {
+          this.viewerError = 'Translation failed for this file.';
+          this.isOpeningViewer = false;
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {
+        this.viewerError = 'Could not check translation status.';
+        this.isOpeningViewer = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  onVersionPicked(version: any): void {
+    this.showVersionPicker = false;
+    this.isOpeningViewer = true;
+    this.pollCount = 0;
+    this.viewerError = null;
+    this.cdr.detectChanges();
+    this.checkAndOpen(version.version_urn, this.pendingFile!.name);
+  }
+
+  onVersionPickerClose(): void {
+    this.showVersionPicker = false;
+    this.selectedFile = null;
+    this.pendingFile = null;
+    this.cdr.detectChanges();
+  }
+
+  formatVersionDate(dateStr: string): string {
+    return new Date(dateStr).toLocaleDateString('en-GB', {
+      day: '2-digit', month: 'short', year: 'numeric'
+    });
   }
 }

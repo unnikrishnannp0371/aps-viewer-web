@@ -1,4 +1,5 @@
 <div class="viewer-page">
+
   @if (isLoading) {
     <div class="viewer-loading">
       <div class="spinner"></div>
@@ -20,14 +21,51 @@
         <span class="viewer-filename">{{ viewerData.file_name }}</span>
       </div>
       <div class="viewer-header-right">
+      @if (viewerData.expires_at) {
         <span class="viewer-expiry">
           Expires {{ viewerData.expires_at | date:'mediumDate' }}
         </span>
+      }
+        @if (!viewerData.is_shared) {
+          <button class="share-btn" (click)="onShareToggle()">⤴ Share</button>
+        }
       </div>
     </div>
+
+    @if (!viewerData.is_shared && showSharePanel) {
+      <div class="share-panel">
+        <div class="share-panel-inner">
+          <span class="share-panel-title">Share this model</span>
+          <div class="share-expiry-options">
+            <button class="share-expiry-btn" [class.active]="shareExpiry === 7" (click)="shareExpiry = 7">7 days</button>
+            <button class="share-expiry-btn" [class.active]="shareExpiry === 30" (click)="shareExpiry = 30">30 days</button>
+            <button class="share-expiry-btn" [class.active]="shareExpiry === 90" (click)="shareExpiry = 90">90 days</button>
+          </div>
+          @if (!shareUrl) {
+            <button class="share-generate-btn" 
+              [disabled]="isGeneratingShare || shareExpiry === 0" 
+              (click)="onGenerateShare()">
+              {{ isGeneratingShare ? 'Generating...' : 'Generate Link' }}
+            </button>
+          }
+          @if (shareUrl) {
+            <div class="share-url-row">
+              <input class="share-url-input" [value]="shareUrl" readonly />
+              <button class="share-copy-btn" (click)="onCopy()">
+                {{ copied ? '✓ Copied' : 'Copy' }}
+              </button>
+            </div>
+          }
+          @if (shareError) {
+            <span class="share-error">{{ shareError }}</span>
+          }
+        </div>
+      </div>
+    }
   }
 
   <div class="viewer-body">
+
     @if (viewables3D.length > 0 || viewables2D.length > 0) {
       <div class="views-panel">
         <div class="panel-tabs">
@@ -78,5 +116,7 @@
     }
 
     <div #viewerContainer class="viewer-container"></div>
+
   </div>
+
 </div>
