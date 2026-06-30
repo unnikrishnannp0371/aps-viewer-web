@@ -12,7 +12,7 @@
   border-left: 4px solid transparent; 
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
   font-family: 'IBM Plex Sans', sans-serif;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 /* ── Header ───────────────────────────────────────────────────────────────── */
@@ -329,4 +329,65 @@
 }
 .domain-group-header .domain-bar-track {
   flex: 1;
+}
+
+.domain-score-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 80px;
+}
+
+.domain-contribution {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+/* ── Tooltip ──────────────────────────────────────────────────────────────── */
+
+.info-tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: default;
+}
+
+.i-icon {
+  font-size: 0.68rem;
+  color: #9ca3af;
+  margin-left: 3px;
+  line-height: 1;
+}
+
+.info-tooltip-wrapper::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: auto;
+  transform: none;
+  background: #1f2937;
+  color: #f9fafb;
+  font-size: 0.72rem;
+  font-family: 'IBM Plex Sans', sans-serif;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: normal;
+  width: 280px;
+  max-width: unset;
+  line-height: 1.4;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 100;
+}
+
+.info-tooltip-wrapper:hover::after {
+  opacity: 1;
+}
+
+.info-tooltip-wrapper.tooltip-right::after {
+  right: auto;
+  left: 0;
 }

@@ -18,7 +18,6 @@ import { HealthService, HealthSignal, ProjectHealth } from '../../services/healt
   styleUrl: './health-panel.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-
 export class HealthPanel implements OnInit, OnChanges {
   @Input() hubId!: string;
   @Input() projectId!: string;
@@ -62,21 +61,20 @@ export class HealthPanel implements OnInit, OnChanges {
       }
     });
   }
+
   // ── Template Helpers ───────────────────────────────────────────────────────
 
-  // Colour of the score ring and grade badge — driven by grade
   gradeColor(grade: string): string {
     const map: Record<string, string> = {
-      A: '#38a169',  // green
-      B: '#68d391',  // light green
-      C: '#dd6b20',  // orange
-      D: '#e53e3e',  // red
-      F: '#742a2a'   // dark red
+      A: '#38a169',
+      B: '#68d391',
+      C: '#dd6b20',
+      D: '#e53e3e',
+      F: '#742a2a'
     };
-    return map[grade] ?? '#9ca3af'; // default gray
+    return map[grade] ?? '#9ca3af';
   }
 
-  // severity indicator for each signal — driven by severity
   severityColor(severity: HealthSignal['severity']): string {
     const map = {
       good:     '#38a169',
@@ -85,12 +83,11 @@ export class HealthPanel implements OnInit, OnChanges {
     };
     return map[severity];
   }
-  // Domain score bar width as a percentage string
+
   domainWidth(score: number): string {
     return `${score}%`;
   }
 
-  // Domain score colour — same logic as grade but driven by raw score
   domainColor(score: number): string {
     if (score >= 85) return '#38a169';
     if (score >= 70) return '#68d391';
@@ -99,7 +96,6 @@ export class HealthPanel implements OnInit, OnChanges {
     return '#742a2a';
   }
 
-  // Human readable domain names
   domainLabel(key: string): string {
     const map: Record<string, string> = {
       issues:     'Issues',
@@ -110,19 +106,28 @@ export class HealthPanel implements OnInit, OnChanges {
     return map[key] ?? key;
   }
 
-  // Domain entries as array so template can iterate
   get domainEntries() {
     if (!this.health) return [];
     return this.domainOrder.map(key => {
       const ds = this.health!.domain_scores[key as keyof typeof this.health.domain_scores];
+      const weightPct = Math.round(ds.weight * 100);
       return {
         key,
-        label:   this.domainLabel(key),
-        score:   ds.score,
-        weight:  Math.round(ds.weight * 100),
-        signals: this.signalsForDomain(key)
+        label:           this.domainLabel(key),
+        score:           ds.score,
+        weight:          weightPct,
+        contribution:    Math.round(ds.score * ds.weight),
+        signals:         this.signalsForDomain(key),
+        scoreTooltip: `Health score out of 100 for ${this.domainLabel(key)}. Based on active, overdue, and unresolved items.`,
+        contribTooltip: `Contributes up to ${weightPct} pts to the overall score. Currently ${Math.round(ds.score * ds.weight)}/${weightPct} pts (score × weight).`
       };
     });
+  }
+
+  get overallTooltip(): string {
+    if (!this.health) return '';
+    const parts = this.domainEntries.map(e => `${e.label} ${e.contribution}`).join(' + ');
+    return `${parts} = ${this.health.overall}/100`;
   }
 
   toggleDomain(key: string): void {
@@ -134,7 +139,6 @@ export class HealthPanel implements OnInit, OnChanges {
     return this.health.signals.filter(s => s.domain === domain);
   }
 
-  // Format the calculated_at timestamp
   formatTime(iso: string): string {
     return new Date(iso).toLocaleTimeString(undefined, {
       hour:   '2-digit',
@@ -142,4 +146,3 @@ export class HealthPanel implements OnInit, OnChanges {
     });
   }
 }
-

@@ -9,6 +9,7 @@ import { DashboardViewer, ViewerTarget } from '../dashboard-viewer/dashboard-vie
 import { HealthPanel } from '../health-panel/health-panel';
 import { RfiPanel } from '../rfi-panel/rfi-panel';
 import { SubmittalsPanel } from '../submittals-panel/submittals-panel';
+import { ClashesPanel } from '../clashes-panel/clashes-panel';
 
 export type DashboardTab = 'issues' | 'rfi' | 'submittals' | 'clashes';
 export interface Tab {
@@ -26,7 +27,8 @@ export interface Tab {
     DashboardViewer,
     HealthPanel,
     RfiPanel,
-    SubmittalsPanel
+    SubmittalsPanel,
+    ClashesPanel
   ],
   templateUrl: './project-dashboard.html',
   styleUrl: './project-dashboard.css'
@@ -48,7 +50,7 @@ export class ProjectDashboard implements OnInit {
     { key: 'issues',     label: 'Issues',     ready: true  },
     { key: 'rfi',        label: 'RFIs',       ready: true  },
     { key: 'submittals', label: 'Submittals', ready: true },
-    { key: 'clashes',    label: 'Clashes',    ready: false },
+    { key: 'clashes',    label: 'Clashes',    ready: true },
   ];
 
   constructor(

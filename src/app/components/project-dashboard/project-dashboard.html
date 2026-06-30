@@ -76,10 +76,7 @@
           <app-submittals-panel [hubId]="hubId" [projectId]="projectId" />
         }
         @if (isActive('clashes')) {
-          <div class="tab-placeholder">
-            <span class="placeholder-icon">⚡</span>
-            <p>Clashes panel coming soon</p>
-          </div>
+          <app-clashes-panel [hubId]="hubId" [projectId]="projectId" />
         }
       </section>
     </div>

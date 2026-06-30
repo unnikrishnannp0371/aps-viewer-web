@@ -1,0 +1,93 @@
+<!-- src/app/components/clashes-panel/clashes-panel.html -->
+
+<div class="clashes-panel">
+
+  <!-- ── Loading ─────────────────────────────────────────────────────────── -->
+  @if (loading) {
+    <div class="panel-loading">
+      <span class="spinner"></span>
+      Loading clash data...
+    </div>
+  }
+
+  <!-- ── Error ───────────────────────────────────────────────────────────── -->
+  @if (error && !loading) {
+    <div class="panel-error">
+      {{ error }}
+      <button (click)="loadClashes()">Retry</button>
+    </div>
+  }
+
+  @if (summary && !loading) {
+
+    @if (summary.total === 0) {
+      <!-- ── Empty ──────────────────────────────────────────────────────── -->
+      <div class="panel-empty">
+        <span class="empty-icon">⚡</span>
+        <p class="empty-title">No clashes detected</p>
+        <p class="empty-sub">Clash tests will appear here once model sets are processed.</p>
+      </div>
+
+    } @else {
+
+      <!-- ── Status Summary Cards ───────────────────────────────────────── -->
+      <div class="status-strip">
+        <div class="status-header">
+          <span class="status-title">
+            <span class="status-dot" [class.dot-alert]="totalNew > 0"></span>
+            Clash Overview
+          </span>
+          <span class="status-total">{{ totalClashes | number }} total</span>
+        </div>
+
+        <div class="status-cards">
+
+          <div class="status-card status-card--alert">
+            <span class="status-value" [class.value-alert]="totalNew > 0">
+              {{ totalNew | number }}
+            </span>
+            <span class="status-label">New</span>
+            <span class="status-sub">unreviewed clashes</span>
+          </div>
+
+          <div class="status-card" [class.status-card--warn]="totalAssigned > 0">
+            <span class="status-value" [class.value-warn]="totalAssigned > 0">
+              {{ totalAssigned | number }}
+            </span>
+            <span class="status-label">Assigned</span>
+            <span class="status-sub">in progress</span>
+          </div>
+
+          <div class="status-card status-card--neutral">
+            <span class="status-value">
+              {{ totalClosed | number }}
+            </span>
+            <span class="status-label">Closed</span>
+            <span class="status-sub">resolved</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── Per Modelset Breakdown ─────────────────────────────────────── -->
+      @if (modelsets.length > 0) {
+        <div class="section">
+          <span class="section-title">By Coordination Space</span>
+          <div class="bar-chart">
+            @for (ms of modelsets; track ms.modelSetId) {
+              <div class="bar-row">
+                <span class="bar-label" [title]="ms.name">{{ ms.name }}</span>
+                <div class="bar-track">
+                  <div class="bar-fill bar-fill--clash" [style.width]="modelsetBarWidth(ms)"></div>
+                </div>
+                <span class="bar-count">{{ ms.total | number }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+    }
+  }
+
+</div>

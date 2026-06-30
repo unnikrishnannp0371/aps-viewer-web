@@ -45,14 +45,8 @@
     @if (!health.data_available) {
       <div class="panel-empty">
         <span class="empty-icon">📊</span>
-
-        <p class="empty-title">
-          Not enough data to calculate health
-        </p>
-
-        <p class="empty-sub">
-          Health score appears once Issues, RFIs, or Submittals have data.
-        </p>
+        <p class="empty-title">Not enough data to calculate health</p>
+        <p class="empty-sub">Health score appears once Issues, RFIs, or Submittals have data.</p>
       </div>
 
     } @else {
@@ -64,21 +58,13 @@
 
           <div class="score-ring-wrapper">
             <svg class="score-ring" viewBox="0 0 120 120">
-
               <circle
                 class="ring-track"
-                cx="60"
-                cy="60"
-                r="50"
-                fill="none"
-                stroke="#f3f4f6"
-                stroke-width="10" />
-
+                cx="60" cy="60" r="50"
+                fill="none" stroke="#f3f4f6" stroke-width="10" />
               <circle
                 class="ring-fill"
-                cx="60"
-                cy="60"
-                r="50"
+                cx="60" cy="60" r="50"
                 fill="none"
                 [attr.stroke]="gradeColor(health.grade)"
                 stroke-width="10"
@@ -86,33 +72,32 @@
                 stroke-dasharray="314"
                 [attr.stroke-dashoffset]="314 - (314 * health.overall / 100)"
                 transform="rotate(-90 60 60)" />
-
             </svg>
 
             <div class="score-centre">
-              <span
-                class="score-number"
-                [style.color]="gradeColor(health.grade)">
+              <span class="score-number" [style.color]="gradeColor(health.grade)">
                 {{ health.overall }}
               </span>
-
               <span class="score-out-of">/ 100</span>
             </div>
           </div>
+
+          <!-- Overall score tooltip -->
+          <span
+            class="info-tooltip-wrapper tooltip-right"
+            [attr.data-tooltip]="overallTooltip">
+            <span class="i-icon">ⓘ</span>
+          </span>
 
           <div
             class="grade-badge"
             [style.background]="gradeColor(health.grade) + '22'"
             [style.color]="gradeColor(health.grade)"
             [style.borderColor]="gradeColor(health.grade) + '55'">
-
             Grade {{ health.grade }}
-
           </div>
 
-          <div class="health-label">
-            {{ health.label }}
-          </div>
+          <div class="health-label">{{ health.label }}</div>
 
         </div>
 
@@ -130,13 +115,8 @@
                 (click)="toggleDomain(domain.key)">
 
                 <div class="domain-group-meta">
-                  <span class="domain-label">
-                    {{ domain.label }}
-                  </span>
-
-                  <span class="domain-weight">
-                    {{ domain.weight }}% weight
-                  </span>
+                  <span class="domain-label">{{ domain.label }}</span>
+                  <span class="domain-weight">{{ domain.weight }}% weight</span>
                 </div>
 
                 <div class="domain-bar-track">
@@ -147,11 +127,29 @@
                   </div>
                 </div>
 
-                <span
-                  class="domain-score"
-                  [style.color]="domainColor(domain.score)">
-                  {{ domain.score }}
-                </span>
+                <div class="domain-score-stack">
+                  <div class="domain-score-row">
+                    <span class="domain-score" [style.color]="domainColor(domain.score)">
+                      {{ domain.score }}/100
+                    </span>
+                    <span
+                      class="info-tooltip-wrapper"
+                      [attr.data-tooltip]="domain.scoreTooltip">
+                      <span class="i-icon">ⓘ</span>
+                    </span>
+                  </div>
+
+                  <div class="domain-contrib-row">
+                    <span class="domain-contribution">
+                      {{ domain.contribution }}/{{ domain.weight }} pts
+                    </span>
+                    <span
+                      class="info-tooltip-wrapper"
+                      [attr.data-tooltip]="domain.contribTooltip">
+                      <span class="i-icon">ⓘ</span>
+                    </span>
+                  </div>
+                </div>
 
                 <span class="domain-chevron">
                   {{ expandedDomain === domain.key ? '▲' : '▼' }}
@@ -160,44 +158,28 @@
               </div>
 
               @if (expandedDomain === domain.key) {
-
                 <div class="domain-signals">
 
                   @if (domain.signals.length === 0) {
-
-                    <div class="signal-empty">
-                      No signals available
-                    </div>
-
+                    <div class="signal-empty">No signals available</div>
                   } @else {
-
                     @for (signal of domain.signals; track signal.key) {
-
                       <div class="signal-row">
-
                         <span
                           class="signal-dot"
                           [style.background]="severityColor(signal.severity)">
                         </span>
-
-                        <span class="signal-label">
-                          {{ signal.label }}
-                        </span>
-
+                        <span class="signal-label">{{ signal.label }}</span>
                         <span
                           class="signal-value"
                           [style.color]="severityColor(signal.severity)">
                           {{ signal.value }}
                         </span>
-
                       </div>
-
                     }
-
                   }
 
                 </div>
-
               }
 
             </div>
