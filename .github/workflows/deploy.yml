@@ -1,5 +1,8 @@
 name: Deploy to AWS
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main]
