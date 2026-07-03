@@ -111,12 +111,15 @@ export class HealthPanel implements OnInit, OnChanges {
     return this.domainOrder.map(key => {
       const ds = this.health!.domain_scores[key as keyof typeof this.health.domain_scores];
       const weightPct = Math.round(ds.weight * 100);
+      const isNeutral = (ds as any).neutral === true;
+      console.log('clashes ds:', ds, 'neutral:', (ds as any).neutral);
       return {
         key,
         label:           this.domainLabel(key),
         score:           ds.score,
         weight:          weightPct,
         contribution:    Math.round(ds.score * ds.weight),
+        isNeutral,
         signals:         this.signalsForDomain(key),
         scoreTooltip: `Health score out of 100 for ${this.domainLabel(key)}. Based on active, overdue, and unresolved items.`,
         contribTooltip: `Contributes up to ${weightPct} pts to the overall score. Currently ${Math.round(ds.score * ds.weight)}/${weightPct} pts (score × weight).`
@@ -126,7 +129,10 @@ export class HealthPanel implements OnInit, OnChanges {
 
   get overallTooltip(): string {
     if (!this.health) return '';
-    const parts = this.domainEntries.map(e => `${e.label} ${e.contribution}`).join(' + ');
+    const parts = this.domainEntries
+      .filter(e => !e.isNeutral)
+      .map(e => `${e.label} ${e.contribution}`)
+      .join(' + ');
     return `${parts} = ${this.health.overall}/100`;
   }
 
