@@ -391,3 +391,7 @@
   right: auto;
   left: 0;
 }
+
+.info-tooltip-wrapper::after {
+  top: calc(100% + 2px);
+}
