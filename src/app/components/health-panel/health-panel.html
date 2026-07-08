@@ -22,8 +22,10 @@
   <!-- ── Loading ─────────────────────────────────────────────────────────── -->
   @if (isLoading) {
     <div class="panel-loading">
-      <div class="spinner"></div>
-      <span>Calculating health score…</span>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" [style.width.%]="progress"></div>
+      </div>
+      <span>{{ statusText }}</span>
     </div>
   }
 

@@ -10,6 +10,7 @@ import { HealthPanel } from '../health-panel/health-panel';
 import { RfiPanel } from '../rfi-panel/rfi-panel';
 import { SubmittalsPanel } from '../submittals-panel/submittals-panel';
 import { ClashesPanel } from '../clashes-panel/clashes-panel';
+import { ProjectHealth } from '../../services/health';
 
 export type DashboardTab = 'issues' | 'rfi' | 'submittals' | 'clashes';
 export interface Tab {
@@ -41,6 +42,7 @@ export class ProjectDashboard implements OnInit {
   isLoadingProject          = true;
 
   viewerTarget: ViewerTarget | null = null;
+  healthTotals: ProjectHealth['totals'] | null = null;
 
   // ── Tab state ─────────────────────────────────────────────────────────────
 
@@ -84,6 +86,13 @@ export class ProjectDashboard implements OnInit {
     });
   }
 
+  private readonly totalsKeyMap: Record<DashboardTab, keyof ProjectHealth['totals']> = {
+    issues: 'issues',
+    rfi: 'rfis',
+    submittals: 'submittals',
+    clashes: 'clashes'
+  };
+
   // ── Tab switching ─────────────────────────────────────────────────────────
 
   selectTab(tab: Tab): void {
@@ -118,5 +127,13 @@ export class ProjectDashboard implements OnInit {
 
   onViewerClosed(): void {
     this.viewerTarget = null;
+  }
+
+  onHealthLoaded(health: ProjectHealth): void {
+    this.healthTotals = health.totals;
+  }
+
+  tabTotal(key: DashboardTab): number | null {
+    return this.healthTotals ? this.healthTotals[this.totalsKeyMap[key]] : null;
   }
 }

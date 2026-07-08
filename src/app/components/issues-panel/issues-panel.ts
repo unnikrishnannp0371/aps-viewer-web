@@ -56,6 +56,8 @@ export class IssuesPanel implements OnInit, OnChanges {
   currentPage   = 0;
   pageSize      = 20;
   totalIssues   = 0;
+  overallTotal = 0;
+
 
   expandedRowId: string | null = null;
 
@@ -123,15 +125,16 @@ export class IssuesPanel implements OnInit, OnChanges {
       this.pageSize,
       this.currentPage * this.pageSize
     ).subscribe({
-      next: data => {
-        this.summary = cached
-          ? { ...data, by_status: cached.by_status, by_type: cached.by_type,
-              by_assignee: cached.by_assignee, attention: cached.attention }
-          : data;
-        this.totalIssues = data.total;
-        this.loading     = false;
-        this.cdr.markForCheck();
-      },
+        next: data => {
+          this.summary = cached
+            ? { ...data, by_status: cached.by_status, by_type: cached.by_type,
+                by_assignee: cached.by_assignee, attention: cached.attention }
+            : data;
+          this.totalIssues = data.total;
+          if (this.activeStatus === 'all') this.overallTotal = data.total;
+          this.loading     = false;
+          this.cdr.markForCheck();
+        },
       error: () => {
         this.error   = 'Failed to load issues. Please try again.';
         this.loading = false;
