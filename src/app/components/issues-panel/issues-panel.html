@@ -19,7 +19,7 @@
   }
 
   @if (summary && !loading) {
-    @if (summary.total === 0) {
+    @if (overallTotal === 0) {
       <div class="panel-empty">
         <span class="empty-icon">📋</span>
         <p class="empty-title">No issues on this project</p>

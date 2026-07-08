@@ -259,3 +259,12 @@
     display: none;
   }
 }
+
+.tab-count {
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: #e5e7eb;
+  color: #4b5563;
+  font-size: 0.75rem;
+}

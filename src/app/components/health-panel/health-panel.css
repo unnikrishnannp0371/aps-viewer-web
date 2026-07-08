@@ -60,18 +60,19 @@
   font-size: 0.875rem;
 }
 
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #e5e7eb;
-  border-top-color: #38a169;
-  border-radius: 50%;
-  animation: spin 0.65s linear infinite;
-  flex-shrink: 0;
+.progress-bar-track {
+  width: 100%;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.progress-bar-fill {
+  height: 100%;
+  background: #38a169;
+  border-radius: 3px;
+  transition: width 0.15s ease-out;
 }
 
 /* ── Error ────────────────────────────────────────────────────────────────── */

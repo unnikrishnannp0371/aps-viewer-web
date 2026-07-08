@@ -35,7 +35,7 @@
 
   <!-- Health always full width at top -->
   <section class="health-section">
-    <app-health-panel [hubId]="hubId" [projectId]="projectId" />
+    <app-health-panel [hubId]="hubId" [projectId]="projectId" (healthLoaded)="onHealthLoaded($event)" />
   </section>
 
   <!-- Side by side: panels left, viewer right -->
@@ -53,6 +53,12 @@
             (click)="selectTab(tab)"
             [title]="!tab.ready ? tab.label + ' — coming soon' : ''">
             {{ tab.label }}
+            @if (isActive(tab.key) && tabTotal(tab.key) !== null) {
+              <span class="tab-count">{{ tabTotal(tab.key) }}</span>
+            }
+            @if (!tab.ready) {
+              <span class="tab-soon">soon</span>
+            }
             @if (!tab.ready) {
               <span class="tab-soon">soon</span>
             }
