@@ -35,7 +35,7 @@ export class Login implements OnInit {
     this.authService.checkStatus().subscribe({
       next: (status) => {
         if (status.authenticated) {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/admin']);
         }
       },
       error: () => {}

@@ -1,0 +1,46 @@
+<!-- src/app/components/admin-router/admin-router.html -->
+
+<div class="router-page">
+
+  <header class="router-topbar">
+    <div class="topbar-brand">
+      <span class="brand-icon">◈</span>
+      <span class="brand-name">APS Dashboard</span>
+    </div>
+    <button class="logout-btn" (click)="onLogout()">Log out</button>
+  </header>
+
+  <main class="router-main">
+    <div class="router-card">
+      <h1 class="router-title">Where do you want to go?</h1>
+      <p class="router-subtitle">Role-based routing is stubbed for now — pick one.</p>
+
+      <div class="role-options">
+        <button
+          class="role-card"
+          [class.selected]="selectedRole === 'dashboard'"
+          (click)="onSelectRole('dashboard')">
+          <span class="role-name">Dashboard</span>
+          <span class="role-desc">Project health, issues, RFIs, submittals</span>
+        </button>
+
+        <button
+          class="role-card"
+          [class.selected]="selectedRole === 'viewer'"
+          (click)="onSelectRole('viewer')">
+          <span class="role-name">Viewer</span>
+          <span class="role-desc">Browse hubs and open models</span>
+        </button>
+
+        <button
+          class="role-card disabled"
+          [class.selected]="selectedRole === 'checqr'"
+          disabled>
+          <span class="role-name">ChecQR</span>
+          <span class="role-desc">Not deployed yet</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+</div>

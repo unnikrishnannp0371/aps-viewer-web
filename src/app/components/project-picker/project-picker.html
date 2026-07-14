@@ -5,15 +5,14 @@
   <!-- ── Top Bar ─────────────────────────────────────────────────────────── -->
   <header class="picker-topbar">
     <div class="topbar-brand">
+      <div class="header-left">
+        <button class="back-btn" (click)="onBackToPicker()">
+          ‹ Back to Admin
+        </button>
+      </div>
+
       <span class="brand-icon">◈</span>
       <span class="brand-name">APS Dashboard</span>
-    </div>
-
-    <div class="topbar-user">
-      @if (user) {
-        <span class="user-name">{{ user.name }}</span>
-      }
-      <button class="logout-btn" (click)="onLogout()">Log out</button>
     </div>
   </header>
 

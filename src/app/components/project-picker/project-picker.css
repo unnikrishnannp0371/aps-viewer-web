@@ -306,3 +306,18 @@
   color: #9ca3af;
   font-size: 0.875rem;
 }
+.back-btn {
+  background: none;
+  border: none;
+  color: #0696d7;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.15s;
+}
+
+.back-btn:hover {
+  opacity: 0.7;
+}

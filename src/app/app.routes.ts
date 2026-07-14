@@ -10,6 +10,13 @@ export const routes: Routes = [
     component: Login
   },
 
+  // Post-login landing. Role-based routing stub — real roles come later.
+  {
+    path: 'admin',
+    loadComponent: () => import('./components/admin-router/admin-router').then(m => m.AdminRouter),
+    canActivate: [authGuard]
+  },
+
   // Step 1 — hub + project picker (replaces old welcome dashboard)
   {
     path: 'dashboard',
@@ -40,7 +47,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'dashboard',
+    redirectTo: 'admin',
     pathMatch: 'full'
   },
   {
