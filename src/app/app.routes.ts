@@ -2,12 +2,16 @@
 
 import { Routes } from '@angular/router';
 import { Login } from './components/login/login';
+import { DashboardLogin } from './components/dashboard-login/dashboard-login';
 import { authGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
   {
     path: 'login',
     component: Login
+  },
+  { path: 'dashboardlogin', 
+    component: DashboardLogin 
   },
 
   // Step 1 — hub + project picker (replaces old welcome dashboard)
