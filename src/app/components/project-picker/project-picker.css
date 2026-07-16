@@ -32,6 +32,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
   font-weight: 700;
   font-size: 1rem;
   color: #fff;
@@ -65,6 +66,7 @@
   font-size: 0.8rem;
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
+  margin-left: auto;
 }
 
 .logout-btn:hover {
@@ -305,4 +307,19 @@
   text-align: center;
   color: #9ca3af;
   font-size: 0.875rem;
+}
+.back-btn {
+  background: none;
+  border: none;
+  color: #0696d7;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.15s;
+}
+
+.back-btn:hover {
+  opacity: 0.7;
 }

@@ -3,6 +3,7 @@
 import { Routes } from '@angular/router';
 import { Login } from './components/login/login';
 import { DashboardLogin } from './components/dashboard-login/dashboard-login';
+import { AdminRouter } from './components/admin-router/admin-router';
 import { authGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
@@ -12,6 +13,16 @@ export const routes: Routes = [
   },
   { path: 'dashboardlogin', 
     component: DashboardLogin 
+  },
+  { path: 'marketplace', 
+    component: AdminRouter 
+  },
+
+  // Post-login landing. Role-based routing stub — real roles come later.
+  {
+    path: 'admin',
+    loadComponent: () => import('./components/admin-router/admin-router').then(m => m.AdminRouter),
+    canActivate: [authGuard]
   },
 
   // Step 1 — hub + project picker (replaces old welcome dashboard)
@@ -44,7 +55,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'dashboard',
+    redirectTo: 'admin',
     pathMatch: 'full'
   },
   {

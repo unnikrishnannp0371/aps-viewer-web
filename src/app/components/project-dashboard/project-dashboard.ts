@@ -3,6 +3,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService, User } from '../../services/auth';
 import { BrowserService } from '../../services/browser';
 import { IssuesPanel, IssueViewerEvent } from '../issues-panel/issues-panel';
 import { DashboardViewer, ViewerTarget } from '../dashboard-viewer/dashboard-viewer';
@@ -59,6 +60,7 @@ export class ProjectDashboard implements OnInit {
     private route:          ActivatedRoute,
     private router:         Router,
     private browserService: BrowserService,
+    private authService: AuthService,
     private cdr:            ChangeDetectorRef
   ) {}
 
@@ -83,6 +85,13 @@ export class ProjectDashboard implements OnInit {
         this.isLoadingProject = false;
         this.cdr.detectChanges();
       }
+    });
+  }
+
+  onLogout(): void {
+    this.authService.logout().subscribe({
+      next:() => this.router.navigate(['/login']),
+      error: () => this.router.navigate(['/login'])
     });
   }
 

@@ -25,7 +25,7 @@ export class Login {
     console.log('Form Submitted Data:', this.credentials);
 
     // Redirect cleanly into authenticated dashboard route
-    this.router.navigate(['/dashboardlogin']);
+    this.router.navigate(['/marketplace']);
   }
 
 }

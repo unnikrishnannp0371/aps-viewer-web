@@ -9,7 +9,7 @@
 .health-panel {
   background: #ffffff;
   border-radius: 8px;
-  border-left: 4px solid transparent; 
+  border-left: 4px solid transparent;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
   font-family: 'IBM Plex Sans', sans-serif;
   /* overflow: hidden; */
@@ -111,8 +111,15 @@
 .health-body {
   display: grid;
   grid-template-columns: 220px 1fr;
+  grid-template-rows: 0fr;
   gap: 0;
-  min-height: 280px;
+  /* min-height: 280px; */
+  min-height: 150px;
+  transition: grid-template-rows 0.5s ease;
+}
+
+.health-body.is-expanded {
+  grid-template-rows: 1fr;
 }
 
 /* ── Score Section (left) ─────────────────────────────────────────────────── */
@@ -173,6 +180,17 @@
 
 /* ── Grade Badge ──────────────────────────────────────────────────────────── */
 
+/* .grade-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 4px;
+  border: 1px solid;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+} */
+
 .grade-badge {
   display: inline-block;
   padding: 4px 14px;
@@ -182,21 +200,39 @@
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.05em;
+  margin-top: -2px;
 }
+
+/* .health-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4b5563;
+} */
 
 .health-label {
   font-size: 0.85rem;
   font-weight: 600;
   color: #4b5563;
+  margin-top: -2px;
 }
 
 /* ── Detail Section (right) ───────────────────────────────────────────────── */
 
-.detail-section {
+/* .detail-section {
   display: flex;
   flex-direction: column;
   padding: 24px;
   gap: 0;
+} */
+
+.detail-section {
+  /* display: flex; */
+  /* flex-direction: column; */
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
 }
 
 /* ── Domain Bars ──────────────────────────────────────────────────────────── */
@@ -284,8 +320,23 @@
 
 /* ── Domain Groups ─────────────────────────────────────── */
 
-.domain-group {
+/* .domain-group {
   border-bottom: 1px solid #f3f4f6;
+} */
+
+.domain-group {
+  border: 1px solid #f3f4f6;
+  padding: 1rem;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  height: fit-content;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.5s ease;
+}
+
+.domain-group.is-expanded{
+  grid-template-rows: 1fr;
 }
 
 .domain-group:last-child {
@@ -328,6 +379,7 @@
   color: #9ca3af;
   font-style: italic;
 }
+
 .domain-group-header .domain-bar-track {
   flex: 1;
 }
@@ -354,6 +406,11 @@
   cursor: default;
 }
 
+.score-ring-wrapper .info-tooltip-wrapper {
+  position: absolute;
+  right: -10px;
+}
+
 .i-icon {
   font-size: 0.68rem;
   color: #9ca3af;
@@ -375,8 +432,10 @@
   padding: 6px 10px;
   border-radius: 6px;
   white-space: normal;
-  width: 280px;
-  max-width: unset;
+  /* width: 280px; */
+  min-width: 240px;
+  /* max-width: unset; */
+  max-width: max-content;
   line-height: 1.4;
   pointer-events: none;
   opacity: 0;

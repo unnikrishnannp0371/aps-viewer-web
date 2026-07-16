@@ -1,26 +1,47 @@
 <div class="login-page">
-  <div class="login-card">
-
-    <h1 class="app-title">MGEN Apps</h1>
-    <p class="app-subtitle">Powered by Autodesk Platform Services</p>
-
-    @if (showUnauthorizedBanner) {
-      <div class="banner banner-warning">
-        You must be logged in to access <strong>{{ unauthorizedPageName }}</strong>
-      </div>
-    }
-
-    <button
-      class="login-btn"
-      [disabled]="isLoading"
-      (click)="onLogin()"
-    >
-      @if (isLoading) {
-        <span>Redirecting...</span>
-      } @else {
-        <span>Login with Autodesk</span>
-      }
-    </button>
-
+  <!-- Left Side: Branding / Visual Anchor -->
+   <div class="logo">Dashboard</div>
+  <div class="brand-panel">
+    <div class="brand-content">
+      <h1>Welcome to Your Analytics Hub</h1>
+      <p>Monitor performance, track metrics, and scale your business operations seamlessly.</p>
+    </div>
   </div>
+
+  <!-- Right Side: Interaction Form -->
+  <div class="form-panel">
+    <div class="form-container">
+      <h2 class="title">Sign In</h2>
+      <p class="subtitle">Enter your credentials to access your dashboard</p>
+
+      <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+        <div class="input-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" [(ngModel)]="credentials.email" required
+            placeholder="name@company.com" #emailField="ngModel"
+            [class.error]="emailField.invalid && emailField.touched" />
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" [(ngModel)]="credentials.password" required
+            placeholder="••••••••" #passwordField="ngModel"
+            [class.error]="passwordField.invalid && passwordField.touched" />
+          <div class="label-wrapper">
+            <a href="#" class="forgot-link">Forgot password?</a>
+          </div>
+        </div>
+
+        <div class="remember-me">
+          <input type="checkbox" id="remember" name="remember" [(ngModel)]="credentials.remember">
+          <label for="remember">Keep me logged in for 30 days</label>
+        </div>
+
+        <button type="submit" [disabled]="loginForm.invalid" class="submit-btn">
+          Access Mgen Apps
+        </button>
+      </form>
+    </div>
+  </div>
+
 </div>

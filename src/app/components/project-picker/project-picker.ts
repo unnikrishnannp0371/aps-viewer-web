@@ -111,4 +111,7 @@ export class ProjectPicker implements OnInit{
     if (type?.toLowerCase().includes('bim360')) return 'BIM 360';
     return type;
   }
+  onBackToPicker(): void {
+    this.router.navigate(['/admin']);
+  }
 }
