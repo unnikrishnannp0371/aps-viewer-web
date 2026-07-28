@@ -30,7 +30,7 @@ export class HealthPanel implements OnInit, OnChanges, OnDestroy {
   error: string | null = null;
 
   readonly domainOrder = ['issues', 'rfis', 'submittals', 'clashes'];
-  expandedDomain: string | null = 'issues';
+  expandedDomain: string | null = null;
 
   progress = 0;
   statusText = ""
@@ -129,15 +129,12 @@ export class HealthPanel implements OnInit, OnChanges, OnDestroy {
     return map[severity];
   }
 
-  domainWidth(score: number): string {
-    return `${score}%`;
-  }
-
-  domainColor(score: number): string {
-    if (score >= 85) return '#38a169';
-    if (score >= 70) return '#68d391';
-    if (score >= 55) return '#dd6b20';
-    if (score >= 40) return '#e53e3e';
+  domainColor(resolved: number, total: number): string {
+    const pct = total ? (resolved / total) * 100 : 0;
+    if (pct >= 85) return '#38a169';
+    if (pct >= 70) return '#68d391';
+    if (pct >= 55) return '#dd6b20';
+    if (pct >= 40) return '#e53e3e';
     return '#742a2a';
   }
 
@@ -154,31 +151,30 @@ export class HealthPanel implements OnInit, OnChanges, OnDestroy {
   get domainEntries() {
     if (!this.health) return [];
     return this.domainOrder.map(key => {
-      const ds = this.health!.domain_scores[key as keyof typeof this.health.domain_scores];
-      const weightPct = Math.round(ds.weight * 100);
-      const isNeutral = (ds as any).neutral === true;
-      // console.log('clashes ds:', ds, 'neutral:', (ds as any).neutral);
+      const d = this.health!.domains[key as keyof typeof this.health.domains];
+      const weightPct = Math.round(d.weight * 100);
+      const signals = this.signalsForDomain(key);
       return {
         key,
-        label:           this.domainLabel(key),
-        score:           ds.score,
-        weight:          weightPct,
-        contribution:    Math.round(ds.score * ds.weight),
-        isNeutral,
-        signals:         this.signalsForDomain(key),
-        scoreTooltip: `Health score out of 100 for ${this.domainLabel(key)}. Based on active, overdue, and unresolved items.`,
-        contribTooltip: `Contributes up to ${weightPct} pts to the overall score. Currently ${Math.round(ds.score * ds.weight)}/${weightPct} pts (score × weight).`
+        label:             this.domainLabel(key),
+        resolved:          d.resolved,
+        total:             d.total,
+        needsAttention:    d.needs_attention,
+        isNeutral:         d.neutral,
+        avgDaysToClose:    d.avg_days_to_close,
+        weight:            weightPct,
+        reasonSignals:     signals.filter(s => s.group === 'reason'),
+        infoSignals:       signals.filter(s => s.group === 'info')
       };
     });
   }
 
   get overallTooltip(): string {
     if (!this.health) return '';
-    const parts = this.domainEntries
+    return this.domainEntries
       .filter(e => !e.isNeutral)
-      .map(e => `${e.label} ${e.contribution}`)
-      .join(' + ');
-    return `${parts} = ${this.health.overall}/100`;
+      .map(e => `${e.label} ${e.resolved}/${e.total}`)
+      .join(' · ');
   }
 
   toggleDomain(key: string): void {

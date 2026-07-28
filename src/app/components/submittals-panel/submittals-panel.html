@@ -19,7 +19,7 @@
   }
 
   @if (summary && !loading) {
-    @if (summary.total === 0) {
+    @if (overallTotal === 0) {
       <div class="panel-empty">
         <span class="empty-icon">📁</span>
         <p class="empty-title">No submittals on this project</p>
@@ -42,7 +42,8 @@
 
           <div class="attention-card"
             [class.attention-card--alert]="summary.attention.overdue > 0"
-            (click)="onStatusFilter('open')">
+            [class.attention-card--active]="attentionFilter === 'overdue'"
+            (click)="toggleAttentionFilter('overdue')">
             <span class="attention-value" [class.value-alert]="summary.attention.overdue > 0">
               {{ summary.attention.overdue }}
             </span>
@@ -51,7 +52,9 @@
           </div>
 
           <div class="attention-card"
-            [class.attention-card--warn]="summary.attention.awaiting_review > 0">
+            [class.attention-card--warn]="summary.attention.awaiting_review > 0"
+            [class.attention-card--active]="attentionFilter === 'awaiting_review'"
+            (click)="toggleAttentionFilter('awaiting_review')">
             <span class="attention-value" [class.value-warn]="summary.attention.awaiting_review > 0">
               {{ summary.attention.awaiting_review }}
             </span>
@@ -60,7 +63,9 @@
           </div>
 
           <div class="attention-card"
-            [class.attention-card--warn]="summary.attention.high_priority > 0">
+            [class.attention-card--warn]="summary.attention.high_priority > 0"
+            [class.attention-card--active]="attentionFilter === 'high_priority'"
+            (click)="toggleAttentionFilter('high_priority')">
             <span class="attention-value" [class.value-warn]="summary.attention.high_priority > 0">
               {{ summary.attention.high_priority }}
             </span>
@@ -114,8 +119,29 @@
         }
       </div>
 
+      <!-- ── Spec / Manager Filters ───────────────────────────────────────────── -->
+      <div class="filter-dropdowns">
+        <select class="filter-select" [ngModel]="activeSpec" (ngModelChange)="onSpecFilter($event)">
+          <option value="all">All Specs</option>
+          @for (sp of specOptions; track sp) {
+            <option [value]="sp">{{ sp }}</option>
+          }
+        </select>
+
+        <select class="filter-select" [ngModel]="activeManager" (ngModelChange)="onManagerFilter($event)">
+          <option value="all">All Managers</option>
+          @for (m of managerOptions; track m) {
+            <option [value]="m">{{ m }}</option>
+          }
+        </select>
+
+        @if (hasActiveFilters) {
+          <button class="filter-reset" (click)="resetFilters()">Reset filters</button>
+        }
+      </div>
+
       <!-- ── Submittals Table ───────────────────────────────────────────────── -->
-      <div class="submittals-table-wrap">
+      <div class="submittals-table-wrap" #tableWrap [class.table-flash]="tableFlash">
         <table class="submittals-table">
           <thead>
             <tr>
@@ -129,9 +155,59 @@
               <th class="col-priority">Priority</th>
               <th class="col-expand"></th>
             </tr>
+            <tr class="col-filter-row">
+              <th>
+                <select class="col-filter-select" [ngModel]="columnFilters.risk" (ngModelChange)="setColumnFilter('risk', $event)">
+                  <option value="all">All</option>
+                  <option value="high">High</option>
+                  <option value="medium">Med</option>
+                  <option value="low">Low</option>
+                </select>
+              </th>
+              <th>
+                <input class="col-filter-input" type="text" placeholder="Filter…"
+                  [ngModel]="columnFilters.number" (ngModelChange)="setColumnFilter('number', $event)">
+              </th>
+              <th>
+                <input class="col-filter-input" type="text" placeholder="Filter…"
+                  [ngModel]="columnFilters.title" (ngModelChange)="setColumnFilter('title', $event)">
+              </th>
+              <th>
+                <input class="col-filter-input" type="text" placeholder="Filter…"
+                  [ngModel]="columnFilters.spec" (ngModelChange)="setColumnFilter('spec', $event)">
+              </th>
+              <th>
+                <select class="col-filter-select" [ngModel]="columnFilters.status" (ngModelChange)="setColumnFilter('status', $event)">
+                  @for (s of statusList; track s.key) {
+                    <option [value]="s.key">{{ s.value }}</option>
+                  }
+                </select>
+              </th>
+              <th>
+                <input class="col-filter-input" type="text" placeholder="Filter…"
+                  [ngModel]="columnFilters.ballInCourt" (ngModelChange)="setColumnFilter('ballInCourt', $event)">
+              </th>
+              <th>
+                <input class="col-filter-input" type="date"
+                  [ngModel]="columnFilters.dueDate" (ngModelChange)="setColumnFilter('dueDate', $event)">
+              </th>
+              <th>
+                <select class="col-filter-select" [ngModel]="columnFilters.priority" (ngModelChange)="setColumnFilter('priority', $event)">
+                  <option value="all">All</option>
+                  @for (p of priorityOptions; track p) {
+                    <option [value]="p">{{ p }}</option>
+                  }
+                </select>
+              </th>
+              <th>
+                @if (hasColumnFilters) {
+                  <button class="col-filter-clear" title="Clear column filters" (click)="resetColumnFilters()">×</button>
+                }
+              </th>
+            </tr>
           </thead>
           <tbody>
-            @for (s of summary.submittals; track s.id) {
+            @for (s of displayedSubmittals; track s.id) {
 
               <tr class="submittal-row"
                 [class.submittal-row--expanded]="isExpanded(s.id)"

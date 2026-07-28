@@ -42,7 +42,7 @@ export class ProjectDashboard implements OnInit {
   isLoadingProject          = true;
 
   viewerTarget: ViewerTarget | null = null;
-  healthTotals: ProjectHealth['totals'] | null = null;
+  healthTotals: ProjectHealth['domains'] | null = null;
 
   // ── Tab state ─────────────────────────────────────────────────────────────
 
@@ -86,7 +86,7 @@ export class ProjectDashboard implements OnInit {
     });
   }
 
-  private readonly totalsKeyMap: Record<DashboardTab, keyof ProjectHealth['totals']> = {
+  private readonly totalsKeyMap: Record<DashboardTab, keyof ProjectHealth['domains']> = {
     issues: 'issues',
     rfi: 'rfis',
     submittals: 'submittals',
@@ -130,10 +130,10 @@ export class ProjectDashboard implements OnInit {
   }
 
   onHealthLoaded(health: ProjectHealth): void {
-    this.healthTotals = health.totals;
+    this.healthTotals = health.domains;
   }
 
   tabTotal(key: DashboardTab): number | null {
-    return this.healthTotals ? this.healthTotals[this.totalsKeyMap[key]] : null;
+    return this.healthTotals ? this.healthTotals[this.totalsKeyMap[key]].total : null;
   }
 }
