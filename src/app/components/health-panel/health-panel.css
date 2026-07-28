@@ -330,7 +330,6 @@
   border-radius: 5px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   max-height: 65px;
-  overflow: hidden;
   display: grid;
   transition: all 0.8s ease;
 }
