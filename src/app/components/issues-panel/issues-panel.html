@@ -42,7 +42,8 @@
 
           <div class="attention-card"
             [class.attention-card--alert]="summary.attention.overdue > 0"
-            (click)="onStatusFilter('open')">
+            [class.attention-card--active]="attentionFilter === 'overdue'"
+            (click)="toggleAttentionFilter('overdue')">
             <span class="attention-value" [class.value-alert]="summary.attention.overdue > 0">
               {{ summary.attention.overdue }}
             </span>
@@ -51,7 +52,9 @@
           </div>
 
           <div class="attention-card"
-            [class.attention-card--warn]="summary.attention.unassigned > 0">
+            [class.attention-card--warn]="summary.attention.unassigned > 0"
+            [class.attention-card--active]="attentionFilter === 'unassigned'"
+            (click)="toggleAttentionFilter('unassigned')">
             <span class="attention-value" [class.value-warn]="summary.attention.unassigned > 0">
               {{ summary.attention.unassigned }}
             </span>
@@ -60,7 +63,9 @@
           </div>
 
           <div class="attention-card"
-            [class.attention-card--warn]="summary.attention.stale > 0">
+            [class.attention-card--warn]="summary.attention.stale > 0"
+            [class.attention-card--active]="attentionFilter === 'stale'"
+            (click)="toggleAttentionFilter('stale')">
             <span class="attention-value" [class.value-warn]="summary.attention.stale > 0">
               {{ summary.attention.stale }}
             </span>
@@ -116,19 +121,88 @@
         }
       </div>
 
+      <!-- ── Type / Assignee Filters ──────────────────────────────────────────── -->
+      <div class="filter-dropdowns">
+        <select class="filter-select" [ngModel]="activeType" (ngModelChange)="onTypeFilter($event)">
+          <option value="all">All Types</option>
+          @for (t of typeOptions; track t) {
+            <option [value]="t">{{ t }}</option>
+          }
+        </select>
+
+        <select class="filter-select" [ngModel]="activeAssignee" (ngModelChange)="onAssigneeFilter($event)">
+          <option value="all">All Assignees</option>
+          @for (a of assigneeOptions; track a) {
+            <option [value]="a">{{ a }}</option>
+          }
+        </select>
+
+        @if (hasActiveFilters) {
+          <button class="filter-reset" (click)="resetFilters()">Reset filters</button>
+        }
+      </div>
+
       <!-- ── Issues Table ───────────────────────────────────────────────────── -->
-      <div class="issues-table-wrap">
+      <div class="issues-table-wrap" #tableWrap [class.table-flash]="tableFlash">
         <table class="issues-table">
           <thead>
             <tr>
-              <th class="col-risk">Risk</th>
+              <th class="col-id">Issue ID</th>
               <th class="col-title">Title</th>
-              <th class="col-type">Type</th>
-              <th class="col-assigned">Assigned To</th>
+              <th class="col-person">Created By</th>
+              <th class="col-person">Assigned To</th>
+              <th class="col-risk">Risk</th>
               <th class="col-status">Status</th>
-              <th class="col-due">Due Date</th>
-              <th class="col-location">Location</th>
+              <th class="col-date">Created At</th>
+              <th class="col-date">Due Date</th>
+              <th class="col-date">Time to Close</th>
               <th class="col-expand"></th>
+            </tr>
+            <tr class="col-filter-row">
+              <th>
+                <input class="col-filter-input" type="text" placeholder="Filter…"
+                  [ngModel]="columnFilters.id" (ngModelChange)="setColumnFilter('id', $event)">
+              </th>
+              <th>
+                <input class="col-filter-input" type="text" placeholder="Filter…"
+                  [ngModel]="columnFilters.title" (ngModelChange)="setColumnFilter('title', $event)">
+              </th>
+              <th>
+                <input class="col-filter-input" type="text" placeholder="Filter…"
+                  [ngModel]="columnFilters.createdBy" (ngModelChange)="setColumnFilter('createdBy', $event)">
+              </th>
+              <th>
+                <input class="col-filter-input" type="text" placeholder="Filter…"
+                  [ngModel]="columnFilters.assignedTo" (ngModelChange)="setColumnFilter('assignedTo', $event)">
+              </th>
+              <th>
+                <select class="col-filter-select" [ngModel]="columnFilters.risk" (ngModelChange)="setColumnFilter('risk', $event)">
+                  <option value="all">All</option>
+                  <option value="high">High</option>
+                  <option value="medium">Med</option>
+                  <option value="low">Low</option>
+                </select>
+              </th>
+              <th>
+                <select class="col-filter-select" [ngModel]="columnFilters.status" (ngModelChange)="setColumnFilter('status', $event)">
+                  @for (s of statusList; track s.key) {
+                    <option [value]="s.key">{{ s.value }}</option>
+                  }
+                </select>
+              </th>
+              <th>
+                <input class="col-filter-input" type="date"
+                  [ngModel]="columnFilters.createdAt" (ngModelChange)="setColumnFilter('createdAt', $event)">
+              </th>
+              <th>
+                <input class="col-filter-input" type="date"
+                  [ngModel]="columnFilters.dueDate" (ngModelChange)="setColumnFilter('dueDate', $event)">
+              </th>
+              <th>
+                @if (hasColumnFilters) {
+                  <button class="col-filter-clear" title="Clear column filters" (click)="resetColumnFilters()">×</button>
+                }
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -142,10 +216,8 @@
                 (click)="onIssueClick(issue)"
                 [title]="issue.pushpin ? 'Click to view in model' : ''">
 
-                <td class="col-risk">
-                  <span class="risk-badge" [ngClass]="riskClass(issue.risk_level)">
-                    {{ riskLabel(issue.risk_level) }}
-                  </span>
+                <td class="col-id">
+                  <span class="issue-id">#{{ issue.external_id || issue.id }}</span>
                 </td>
 
                 <td class="col-title">
@@ -155,9 +227,15 @@
                   </span>
                 </td>
 
-                <td class="col-type">{{ issue.issue_type || '—' }}</td>
+                <td class="col-person">{{ issue.created_by || '—' }}</td>
 
-                <td class="col-assigned">{{ issue.assigned_to || '—' }}</td>
+                <td class="col-person">{{ issue.assigned_to || '—' }}</td>
+
+                <td class="col-risk">
+                  <span class="risk-badge" [ngClass]="riskClass(issue.risk_level)">
+                    {{ riskLabel(issue.risk_level) }}
+                  </span>
+                </td>
 
                 <td class="col-status">
                   <span class="status-badge" [ngClass]="statusClass(issue.status)">
@@ -165,12 +243,14 @@
                   </span>
                 </td>
 
-                <td class="col-due"
+                <td class="col-date">{{ formatDate(issue.created_at) }}</td>
+
+                <td class="col-date"
                   [class.overdue]="issue.due_date && issue.status !== 'closed'">
                   {{ formatDate(issue.due_date) }}
                 </td>
 
-                <td class="col-location">{{ issue.location || '—' }}</td>
+                <td class="col-date">{{ daysToClose(issue) }}</td>
 
                 <td class="col-expand">
                   <span class="expand-icon"
@@ -183,7 +263,7 @@
               <!-- Expanded detail row -->
               @if (isExpanded(issue.id)) {
                 <tr class="detail-row">
-                  <td colspan="8">
+                  <td colspan="10">
                     <div class="detail-panel">
                       <div class="detail-grid">
 
@@ -210,16 +290,6 @@
                         </div>
 
                         <div class="detail-block">
-                          <span class="detail-label">Created By</span>
-                          <span class="detail-value">{{ issue.created_by || '—' }}</span>
-                        </div>
-
-                        <div class="detail-block">
-                          <span class="detail-label">Created</span>
-                          <span class="detail-value">{{ formatDate(issue.created_at) }}</span>
-                        </div>
-
-                        <div class="detail-block">
                           <span class="detail-label">Last Updated</span>
                           <span class="detail-value">{{ formatDate(issue.updated_at) }}</span>
                         </div>
@@ -232,7 +302,7 @@
 
             } @empty {
               <tr>
-                <td colspan="8" class="no-data">No issues found</td>
+                <td colspan="10" class="no-data">No issues found</td>
               </tr>
             }
           </tbody>

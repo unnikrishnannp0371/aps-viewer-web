@@ -53,16 +53,20 @@ export interface SubmittalAttention {
 
 export interface SubmittalSummary {
   submittals: Submittal[];
-  total:     number;
-  offset:    number;
-  limit:     number;
-  by_status: SubmittalsByStatus;
-  attention: SubmittalAttention;
+  total:      number;
+  offset:     number;
+  limit:      number;
+  by_status:  SubmittalsByStatus;
+  by_spec:    Record<string, number>;
+  by_manager: Record<string, number>;
+  attention:  SubmittalAttention;
 }
 
 export interface SubmittalFilters {
   status_id?: string;
-  spec_id?:  string;
+  spec_id?:   string;
+  spec?:      string;
+  manager?:   string;
 }
 
 @Injectable({
@@ -70,7 +74,7 @@ export interface SubmittalFilters {
 })
 export class SubmittalsService {
   private apiBaseUrl = '/api/v1';
-  private summaryCache = new Map<string, Pick<SubmittalSummary, 'by_status' | 'attention'>>();
+  private summaryCache = new Map<string, Pick<SubmittalSummary, 'by_status' | 'by_spec' | 'by_manager' | 'attention'>>();
 
   constructor(private http: HttpClient) {}
 
@@ -94,17 +98,21 @@ export class SubmittalsService {
 
     if (filters.status_id) params = params.set('status_id', filters.status_id);
     if (filters.spec_id)   params = params.set('spec_id',   filters.spec_id);
+    if (filters.spec)      params = params.set('spec',      filters.spec);
+    if (filters.manager)   params = params.set('manager',   filters.manager);
 
     return this.http.get<SubmittalSummary>(
       `${this.apiBaseUrl}/projects/${projectId}/submittals`,
       { withCredentials: true, params }
     ).pipe(
       tap(data => {
-        const isUnfiltered = !filters.status_id && !filters.spec_id;
+        const isUnfiltered = !filters.status_id && !filters.spec_id && !filters.spec && !filters.manager;
         if (isUnfiltered) {
           this.summaryCache.set(projectId, {
-            by_status: data.by_status,
-            attention: data.attention
+            by_status:  data.by_status,
+            by_spec:    data.by_spec,
+            by_manager: data.by_manager,
+            attention:  data.attention
           });
         }
       })

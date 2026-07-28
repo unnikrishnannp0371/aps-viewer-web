@@ -16,6 +16,8 @@ export interface IssuePushpin {
 export interface Issue {
   id:             string;
   title:          string;
+  display_id:     string;
+  created_by_name: string;
   status:         string;
   issue_type:     string;
   issue_sub_type: string;
@@ -26,6 +28,7 @@ export interface Issue {
   created_by:     string;
   location:       string;
   description:    string;
+  closed_at:      string
   pushpin:        IssuePushpin | null;
   viewable_id:    string | null;
   external_id:    string;
@@ -91,6 +94,7 @@ export class IssuesService {
       .set('offset', offset);
 
     if (filters.status)      params = params.set('status',      filters.status);
+    if (filters.type)        params = params.set('type',        filters.type);
     if (filters.assigned_to) params = params.set('assigned_to', filters.assigned_to);
 
     return this.http.get<IssuesSummary>(
@@ -98,7 +102,7 @@ export class IssuesService {
       { withCredentials: true, params }
     ).pipe(
       tap(data => {
-        const isUnfiltered = !filters.status && !filters.assigned_to;
+        const isUnfiltered = !filters.status && !filters.type && !filters.assigned_to;
         if (isUnfiltered) {
           this.summaryCache.set(projectId, {
             by_status:   data.by_status,

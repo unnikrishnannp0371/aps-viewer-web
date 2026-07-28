@@ -106,91 +106,99 @@
         <!-- Right — Domain details -->
         <div class="detail-section">
 
-          @for (domain of domainEntries; track domain.key) {
+          <div class="domain-boxes-grid">
 
-            <div
-              class="domain-group"
-              [class.is-expanded]="expandedDomain === domain.key"
-            >
+            @for (domain of domainEntries; track domain.key) {
 
-              <div class="domain-group-header" (click)="toggleDomain(domain.key)">
+              <div
+                class="domain-box"
+                [class.is-expanded]="expandedDomain === domain.key"
+                [style.border-left-color]="domain.isNeutral ? '#e5e7eb' : domainColor(domain.resolved, domain.total)"
+                (click)="toggleDomain(domain.key)"
+              >
 
-                <div class="domain-group-meta">
+                <div class="domain-box-header">
                   <span class="domain-label">{{ domain.label }}</span>
                   <span class="domain-weight">{{ domain.weight }}% weight</span>
                 </div>
 
-                <div class="domain-bar-track">
-                  <div
-                    class="domain-bar-fill"
-                    [style.width]="domain.isNeutral ? '0%' : domainWidth(domain.score)"
-                    [style.background]="domain.isNeutral ? '#e5e7eb' : domainColor(domain.score)"
-                  ></div>
-                </div>
-
-                <div class="domain-score-stack">
-
-                  <div class="domain-score-row">
-                    @if (domain.isNeutral) {
-                      <span class="domain-score domain-score--neutral">N/A</span>
-                    } @else {
-                      <span class="domain-score" [style.color]="domainColor(domain.score)">
-                        {{ domain.score }}/100
-                      </span>
-                    }
-                    <span class="info-tooltip-wrapper" [attr.data-tooltip]="domain.scoreTooltip">
-                      <span class="i-icon">ⓘ</span>
-                    </span>
+                @if (domain.isNeutral) {
+                  <div class="domain-box-value domain-score--neutral">No data</div>
+                } @else {
+                  <div class="domain-box-value" [style.color]="domainColor(domain.resolved, domain.total)">
+                    {{ domain.resolved }}/{{ domain.total }}
                   </div>
+                  <div class="domain-box-caption">resolved</div>
+                }
 
-                  <div class="domain-contrib-row">
-                    @if (domain.isNeutral) {
-                      <span class="domain-contribution domain-score--neutral">No data</span>
-                    } @else {
-                      <span class="domain-contribution">
-                        {{ domain.contribution }}/{{ domain.weight }} pts
-                      </span>
-                      <span class="info-tooltip-wrapper" [attr.data-tooltip]="domain.contribTooltip">
-                        <span class="i-icon">ⓘ</span>
-                      </span>
+                <span class="domain-box-hint">{{ expandedDomain === domain.key ? 'Hide details' : 'View details' }}</span>
+
+                @if (expandedDomain === domain.key) {
+                  <div class="domain-popover" (click)="$event.stopPropagation()">
+
+                    <button class="popover-close" (click)="toggleDomain(domain.key)">×</button>
+
+                    <div class="signal-total-header">
+                      {{ domain.total }} total {{ domain.label }}
+                      @if (domain.avgDaysToClose !== null) {
+                        · avg {{ domain.avgDaysToClose }}d to close
+                      }
+                    </div>
+
+                    @if (domain.reasonSignals.length === 0 && domain.infoSignals.length === 0) {
+                      <div class="signal-empty">No signals available</div>
                     }
+
+                    @if (domain.reasonSignals.length > 0) {
+                      <div class="signal-group-header">Why they need attention</div>
+                      @for (signal of domain.reasonSignals; track signal.key) {
+                        <div class="signal-row">
+                          <span
+                            class="signal-dot"
+                            [style.background]="severityColor(signal.severity)"
+                          ></span>
+                          <span class="signal-label">{{ signal.label }}</span>
+                          <span
+                            class="signal-value"
+                            [style.color]="severityColor(signal.severity)"
+                          >
+                            {{ signal.value }}
+                          </span>
+                        </div>
+                      }
+                      <div class="signal-total-row">
+                        <span class="signal-label">Total</span>
+                        <span class="signal-value">= {{ domain.needsAttention }} need attention</span>
+                      </div>
+                    }
+
+                    @if (domain.infoSignals.length > 0) {
+                      <div class="signal-group-header signal-group-header--info">Other</div>
+                      @for (signal of domain.infoSignals; track signal.key) {
+                        <div class="signal-row signal-row--info">
+                          <span
+                            class="signal-dot"
+                            [style.background]="severityColor(signal.severity)"
+                          ></span>
+                          <span class="signal-label">{{ signal.label }}</span>
+                          <span
+                            class="signal-value"
+                            [style.color]="severityColor(signal.severity)"
+                          >
+                            {{ signal.value }}
+                          </span>
+                        </div>
+                      }
+                    }
+
                   </div>
-
-                </div>
-
-                <span class="domain-chevron">
-                  {{ expandedDomain === domain.key ? '▲' : '▼' }}
-                </span>
+                }
 
               </div>
 
-              @if (expandedDomain === domain.key) {
-                <div class="domain-signals">
-                  @if (domain.signals.length === 0) {
-                    <div class="signal-empty">No signals available</div>
-                  } @else {
-                    @for (signal of domain.signals; track signal.key) {
-                      <div class="signal-row">
-                        <span
-                          class="signal-dot"
-                          [style.background]="severityColor(signal.severity)"
-                        ></span>
-                        <span class="signal-label">{{ signal.label }}</span>
-                        <span
-                          class="signal-value"
-                          [style.color]="severityColor(signal.severity)"
-                        >
-                          {{ signal.value }}
-                        </span>
-                      </div>
-                    }
-                  }
-                </div>
-              }
+            }
 
-            </div>
-
-          }
+          </div>
 
         </div>
 
