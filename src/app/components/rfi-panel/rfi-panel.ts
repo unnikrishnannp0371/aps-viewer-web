@@ -382,14 +382,14 @@ export class RfiPanel implements OnInit, OnChanges {
     return new Date(dateStr).toISOString().slice(0, 10) === filterValue;
   }
 
-  // Days between created_at and updated_at, for closed RFIs only.
+  // Days between created_at and closed_at, for closed RFIs only.
   // No closed_at field exists — updated_at is the same proxy the backend
   // already uses for avg_response_days.
   daysToClose(rfi: Rfi): string {
     if (rfi.status !== 'closed') return '—';
     const created = new Date(rfi.created_at).getTime();
-    const updated = new Date(rfi.updated_at).getTime();
-    return `${Math.round((updated - created) / 86400000)}d`;
+    const closed = new Date(rfi.closed_at).getTime();
+    return `${Math.round((closed - created) / 86400000)}d`;
   }
 
   statusCount(status: keyof Pick<RfiAttention, never>): number {

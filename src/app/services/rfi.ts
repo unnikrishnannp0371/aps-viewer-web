@@ -23,6 +23,7 @@ export interface Rfi {
   schedule_impact:   string | null;
   discipline:        string[];
   category:          string[];
+  closed_at:         string;
   risk_level:        RiskLevel;
 }
 
