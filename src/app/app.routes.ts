@@ -17,19 +17,10 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
-  // Step 1 — hub + project picker (replaces old welcome dashboard)
-  {
-    path: 'dashboard',
-    loadComponent: () => import('./components/project-picker/project-picker').then(m => m.ProjectPicker),
-    canActivate: [authGuard]
-  },
-
-  // Step 2 — the actual project dashboard with all panels
-  {
-    path: 'dashboard/:hubId/:projectId',
-    loadComponent: () => import('./components/project-dashboard/project-dashboard').then(m => m.ProjectDashboard),
-    canActivate: [authGuard]
-  },
+  // Dashboard flow (project-picker, project-dashboard, and the domain
+  // panels) moved to aps-dashboards-web. admin-router's 'dashboard' role
+  // button still navigates to '/dashboard' — that's intentional, it's
+  // handled outside this app now.
 
   {
     path: 'browser',
