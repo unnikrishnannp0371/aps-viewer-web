@@ -58,7 +58,7 @@ export class TranslationService {
   }
 
   getViewerData(token: string): Observable<ViewerData> {
-    return this.http.get<ViewerData>(`/viewer/${token}`);
+    return this.http.get<ViewerData>(`${this.apiBaseUrl}/viewer/${token}`);
   }
 
   getVersions(projectId: string, itemId: string): Observable<Version[]> {
